@@ -1,59 +1,57 @@
 import datetime
+import enum
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, types, ForeignKey, PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.db.dbconnect import Base
 
 
-class DocumentSrc(str, types.Enum):
-    direct_upload = "Direct_Upload"
+class DocumentSrc(str, enum.Enum):
+    upload = "UPLOAD"
     api = "API"
-    email = "Email" 
+    email = "EMAIL"
 
-class DocumentType(str, types.Enum):
-    scan = "Scanned"
-    not_scanned = "Not_Scanned"
+class DocumentType(str, enum.Enum):
+    scan = "SCANNED"
+    not_scanned = "NOT_SCANNED"
 
-class DocumentClass(str, types.Enum):
-    invoice = "Invoice"
-    receipt = "Receipt"
-    other   = "Other"
+class DocumentState(str, enum.Enum):
+    created = "CREATED"
+    queued = "QUEUED"
+    inprocess = "IN_PROCESS"
+    processed = "PROCESSED"
+    failed = "FAILED"
 
-class DocumentState(str, types.Enum):
-    created = "Created"
-    queued = "Queued"
-    inprocess = "In_Process"
-    processed = "Processed"
-    failed = "Failed"
-
-class DocumentReview(str, types.Enum):
-    required = "Required"
-    not_required = "Not_Required"
-    completed = "Completed"
+class DocumentReview(str, enum.Enum):
+    required = "REQUIRED"
+    not_required = "NOT_REQUIRED"
+    completed = "COMPLETED"
 
 class Document_User(Base):
     __tablename__ = "document_user"
     id = Column(types.Integer, primary_key=True)
-    user_id = Column(types.String(50), nullable=False)
-    document_id = Column(types.String(150), nullable=False)
-    user_email = Column(types.String(255), unique=True, nullable=False)
-    user_mobile = Column(types.String(20), unique=True, nullable=False)
-    user_location = Column(types.String(255), nullable=False)
-    user_password = Column(types.Text, nullable=False)
-    user_role = Column(types.Integer, ForeignKey('user_roles.id'))
-    user_type = Column(types.Integer, ForeignKey('user_types.id'))
-    user_credit = Column(types.Float, nullable=False)
-    user_is_deleted = Column(types.Boolean, nullable=False)
-    user_is_active = Column(types.Boolean, nullable=False)
+    user_id = Column(types.Integer, ForeignKey('users_info.id'))
+    document_id = Column(types.Text, nullable=False)
+    document_source = Column(types.Enum(DocumentSrc), nullable=False)
+    document_type = Column(types.Enum(DocumentType), nullable=False)
+    document_class = Column(types.Integer,ForeignKey('document_class.id'))
+    document_location = Column(types.Text, nullable=False)
+    document_category_code = Column(types.Integer, ForeignKey('document_category.id'))
+    document_pages = Column(types.Integer, nullable=True)
+    document_state = Column(types.Enum(DocumentState), nullable=False)
+    document_confidence = Column(types.Float, nullable=False)
+    document_review = Column(types.Enum(DocumentReview), nullable=False)
+    document_is_deleted = Column(types.Boolean, nullable=False)
+    document_process_time_sec = Column(types.Float, nullable=False)
     created_at = Column(types.DateTime, default=datetime.datetime.now)
     updated_at = Column(types.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
-    u_type = relationship("User_Types", back_populates="u_info")
+
+    doc_class_rel = relationship("Document_Class", back_populates="u_info")
     u_role = relationship("User_Roles", back_populates="u_info")
 
     __table_args__ = (
         PrimaryKeyConstraint('id', name='user_pk'),
-        UniqueConstraint('user_name'),
-        UniqueConstraint('user_email')
+        UniqueConstraint('document_id'),
     )
 
     def set_document_id(self, filename):
