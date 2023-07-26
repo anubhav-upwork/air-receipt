@@ -4,8 +4,8 @@ from sqlalchemy import Column, types, ForeignKey, PrimaryKeyConstraint, UniqueCo
 from sqlalchemy.orm import relationship
 from app.db.dbconnect import Base
 
-class Users_Info(Base):
-    __tablename__ = "users_info"
+class User_Info(Base):
+    __tablename__ = "user_info"
     id = Column(types.Integer, primary_key=True)
     user_id = Column(types.String(50), nullable=False)
     user_name = Column(types.String(150), nullable=False)
