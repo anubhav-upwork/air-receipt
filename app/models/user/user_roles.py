@@ -9,7 +9,7 @@ class User_Roles(Base):
     id = Column(types.Integer, primary_key=True)
     user_role = Column(types.String(50), nullable=False)
     created_at = Column(types.DateTime, default=datetime.datetime.now)
-    u_info = relationship("User_Info",back_populates="u_role")
+    u_info = relationship("User_Info",backref="u_role")
 
     def __repr__(self):
         return f"User_Roles({self.id}, {self.user_role}, {self.created_at})"

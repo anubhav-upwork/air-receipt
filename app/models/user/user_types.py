@@ -10,7 +10,7 @@ class User_Types(Base):
     user_type = Column(types.String(50), nullable=False)
     usage_limit_days = Column(types.Integer, nullable=False)
     created_at = Column(types.DateTime, default=datetime.datetime.now)
-    u_info = relationship('User_Info', "u_type")
+    u_info = relationship('User_Info', backref = "u_type")
 
     def __repr__(self):
         return f"User_Type({self.id}, {self.user_type}, {self.usage_limit_days}, {self.created_at})"

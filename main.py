@@ -6,9 +6,12 @@ from sqlalchemy import text
 # assuming that the users directory is within the modules directory,
 # and the models.py file is within the users directory.
 from app.db.dbconnect import engine, Base, SessionLocal
-from app.models.user.user_info import Users_Info
+from app.models.user.user_info import User_Info
 from app.models.user.user_types import User_Types
 from app.models.user.user_roles import User_Roles
+from app.models.documents.document_user import Document_User
+from app.models.documents.document_category import Document_Category
+from app.models.documents.document_class import Document_Class
 
 # from app.modules.users import routes as user_routes
 # from app.modules.todos import routes as todo_routes

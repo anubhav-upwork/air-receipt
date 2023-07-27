@@ -20,8 +20,8 @@ class User_Info(Base):
     user_is_active = Column(types.Boolean, nullable=False)
     created_at = Column(types.DateTime, default=datetime.datetime.now)
     updated_at = Column(types.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
-    u_type = relationship("User_Types", back_populates="u_info")
-    u_role = relationship("User_Roles", back_populates="u_info")
+    u_type = relationship("User_Types", backref="u_info")
+    u_role = relationship("User_Roles", backref="u_info")
 
     __table_args__ = (
         PrimaryKeyConstraint('id', name='user_pk'),
