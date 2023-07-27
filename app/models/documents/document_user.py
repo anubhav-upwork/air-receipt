@@ -30,12 +30,12 @@ class DocumentReview(str, enum.Enum):
 class Document_User(Base):
     __tablename__ = "document_user"
     id = Column(types.Integer, primary_key=True)
-    user_id = Column(types.Integer, ForeignKey('users_info.id'))
-    document_id = Column(types.Text, nullable=False)
+    user_id = Column(types.Integer, ForeignKey('user_info.id'))
+    document_id = Column(types.String(150), nullable=False)
     document_source = Column(types.Enum(DocumentSrc), nullable=False)
     document_type = Column(types.Enum(DocumentType), nullable=False)
     document_class = Column(types.Integer,ForeignKey('document_class.id'))
-    document_location = Column(types.Text, nullable=False)
+    document_location = Column(types.String(200), nullable=False)
     document_category_code = Column(types.Integer, ForeignKey('document_category.id'))
     document_pages = Column(types.Integer, nullable=True)
     document_state = Column(types.Enum(DocumentState), nullable=False)
@@ -46,11 +46,11 @@ class Document_User(Base):
     created_at = Column(types.DateTime, default=datetime.datetime.now)
     updated_at = Column(types.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    doc_class_rel = relationship("Document_Class", back_populates="u_info")
-    u_role = relationship("User_Roles", back_populates="u_info")
+    doc_class_rel = relationship("Document_Class", backref="class_doc_rel")
+    doc_cat_rel  = relationship("Document_Category", backref="category_doc_rel")
 
     __table_args__ = (
-        PrimaryKeyConstraint('id', name='user_pk'),
+        PrimaryKeyConstraint('id', name='doc_pk'),
         UniqueConstraint('document_id'),
     )
 

@@ -16,8 +16,8 @@ class Document_Class(Base):
     doc_class = Column(types.String(150), nullable=False)
     doc_class_code = Column(types.Integer, nullable=False)
     created_at = Column(types.DateTime, default=datetime.datetime.now)
-    doc_user = relationship('User_Info', "u_type")
-
+    class_doc_rel = relationship('Document_User', backref = "doc_class_rel")
+    
     def __repr__(self):
         return f"Document_Class({self.id}, {self.doc_class}, {self.doc_class_code}, {self.created_at})"
         

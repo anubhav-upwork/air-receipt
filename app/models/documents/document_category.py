@@ -10,7 +10,7 @@ class Document_Category(Base):
     category = Column(types.String(150), nullable=False)
     category_code = Column(types.Integer, nullable=False)
     created_at = Column(types.DateTime, default=datetime.datetime.now)
-    u_info = relationship('User_Info', "u_type")
+    category_doc_rel = relationship('Document_User', backref= "doc_cat_rel")
 
     def __repr__(self):
         return f"Document_Category({self.id}, {self.category}, {self.category_code}, {self.created_at})"
