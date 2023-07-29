@@ -7,9 +7,11 @@ from app.db.dbconnect import Base
 class User_Roles(Base):
     __tablename__ = "user_roles"
     id = Column(types.Integer, primary_key=True)
-    user_role = Column(types.String(50), nullable=False)
-    created_at = Column(types.DateTime, default=datetime.datetime.now)
-    u_info = relationship("User_Info",backref="u_role")
+    user_role = Column(types.String(50), unique =True, nullable=False)
+    created_at = Column(types.DateTime, nullable=False, default=datetime.datetime.now)
+
+    # user role and info relationship
+    u_info = relationship("User_Info",back_populates="u_role")
 
     def __repr__(self):
         return f"User_Roles({self.id}, {self.user_role}, {self.created_at})"

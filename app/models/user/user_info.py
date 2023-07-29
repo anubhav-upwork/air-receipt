@@ -18,16 +18,18 @@ class User_Info(Base):
     user_credit = Column(types.Float, nullable=False)
     user_is_deleted = Column(types.Boolean, nullable=False)
     user_is_active = Column(types.Boolean, nullable=False)
-    created_at = Column(types.DateTime, default=datetime.datetime.now)
-    updated_at = Column(types.DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
-    u_type = relationship("User_Types", backref="u_info")
-    u_role = relationship("User_Roles", backref="u_info")
+    created_at = Column(types.DateTime(timezone=True), default=datetime.datetime.now)
+    updated_at = Column(types.DateTime(timezone=True), default=datetime.datetime.now, onupdate=datetime.datetime.now)
 
-    __table_args__ = (
-        PrimaryKeyConstraint('id', name='user_pk'),
-        UniqueConstraint('user_name'),
-        UniqueConstraint('user_email')
-    )
+    # user role and type relationships
+    u_type = relationship("User_Types", back_populates="u_info")
+    u_role = relationship("User_Roles", back_populates="u_info")
+
+    # __table_args__ = (
+    #     PrimaryKeyConstraint('id', name='user_pk'),
+    #     UniqueConstraint('user_name'),
+    #     UniqueConstraint('user_email')
+    # )
 
     def set_password(self, password):
         """Create hashed password."""
