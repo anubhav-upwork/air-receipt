@@ -31,6 +31,9 @@ class User_Info(Base):
     #     UniqueConstraint('user_email')
     # )
 
+    def __repr__(self):
+        return f"User_Info({self.id}, {self.user_name}, {self.user_credit}, {self.created_at})"
+
     def set_password(self, password):
         """Create hashed password."""
         self.user_password = generate_password_hash(
