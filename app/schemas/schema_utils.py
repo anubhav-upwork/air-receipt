@@ -1,5 +1,4 @@
 
-
 def to_camel(string: str) -> str:
     if "_" not in string:
         return string
