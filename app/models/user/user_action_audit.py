@@ -21,7 +21,7 @@ class Audit_Trail(Base):
     user_id = Column(types.Integer, ForeignKey('user_info.id'))
     user_action = Column(types.Enum(User_Action_Audit), nullable=False)
     user_action_desc = Column(types.String(250), nullable=True)
-    created_at = Column(types.DateTime, default=datetime.datetime.now)
+    created_at = Column(types.DateTime, default=datetime.datetime.now())
 
     doc_class_audit_rel = relationship("Document_Class", back_populates="class_doc_audit_rel")
     doc_user_audit_rel = relationship("User_Info", back_populates="doc_user_audit_rel")

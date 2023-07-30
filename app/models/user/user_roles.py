@@ -9,7 +9,7 @@ class User_Roles(Base):
     id = Column(types.Integer, primary_key=True)
     user_role = Column(types.String(50), unique =True, nullable=False)
     user_acess_level = Column(types.Boolean, nullable=False)
-    created_at = Column(types.DateTime, nullable=False, default=datetime.datetime.now)
+    created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
 
     # user role and info relationship
     u_info = relationship("User_Info",back_populates="u_role")

@@ -19,8 +19,8 @@ class User_Info(Base):
     user_credit = Column(types.Numeric(12,2), nullable=False)
     user_is_deleted = Column(types.Boolean, nullable=False, default=False)
     user_is_active = Column(types.Boolean, nullable=False, default=True)
-    created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now)
-    updated_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now, onupdate=datetime.datetime.now)
+    created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
+    updated_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now(), onupdate=datetime.datetime.now())
 
     # user role and type relationships
     u_type = relationship("User_Types", back_populates="u_info")

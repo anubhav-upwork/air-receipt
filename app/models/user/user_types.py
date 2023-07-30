@@ -9,7 +9,7 @@ class User_Types(Base):
     id = Column(types.Integer, primary_key=True)
     user_type = Column(types.String(50), unique=True, nullable=False)
     usage_limit_days = Column(types.Integer, nullable=False)
-    created_at = Column(types.DateTime, nullable=False, default=datetime.datetime.now)
+    created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
 
     # user info to user type relationship
     u_info = relationship('User_Info', back_populates = "u_type")
