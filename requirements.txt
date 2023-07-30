@@ -14,7 +14,7 @@ cryptography
 dnspython
 ecdsa
 email-validator
-fastapi
+fastapi~=0.68.0
 graphene
 graphql-core
 graphql-relay
@@ -29,7 +29,7 @@ MarkupSafe
 orjson
 passlib
 promise
-pydantic
+pydantic~=1.8.2
 python-dateutil
 python-dotenv
 python-editor
@@ -40,8 +40,8 @@ requests
 rsa
 Rx
 six
-SQLAlchemy
-starlette
+SQLAlchemy~=1.4.22
+starlette~=0.14.2
 toml
 typing-extensions
 ujson
@@ -49,3 +49,6 @@ urllib3
 uvicorn
 watchgod
 websockets
+
+app~=0.0.1
+Werkzeug~=2.3.6
