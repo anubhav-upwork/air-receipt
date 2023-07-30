@@ -10,11 +10,11 @@ class Document_Category(Base):
     category = Column(types.String(150), nullable=False)
     category_code = Column(types.Integer, nullable=False)
     created_at = Column(types.DateTime, default=datetime.datetime.now)
-    category_doc_rel = relationship('Document_User', backref= "doc_cat_rel")
+    category_doc_rel = relationship('Document_User', backref="doc_cat_rel")
 
     def __repr__(self):
         return f"Document_Category({self.id}, {self.category}, {self.category_code}, {self.created_at})"
-        
+
     @property
     def to_json(self):
         return {
@@ -23,4 +23,3 @@ class Document_Category(Base):
             'category_code': self.category_code,
             'created_at': self.created_at
         }
-    
