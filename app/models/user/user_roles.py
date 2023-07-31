@@ -7,16 +7,16 @@ from app.db.dbconnect import Base
 class User_Roles(Base):
     __tablename__ = "user_roles"
     id = Column(types.Integer, primary_key=True)
-    user_role = Column(types.String(50), unique =True, nullable=False)
-    user_acess_level = Column(types.Boolean, nullable=False)
+    user_role = Column(types.String(50), unique=True, nullable=False)
+    user_access_level = Column(types.SmallInteger, nullable=False)
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
 
     # user role and info relationship
-    u_info = relationship("User_Info",back_populates="u_role")
+    u_info = relationship("User_Info", back_populates="u_role")
 
     def __repr__(self):
         return f"User_Roles({self.id}, {self.user_role}, {self.user_acess_level}, {self.created_at})"
-    
+
     @property
     def to_json(self):
         return {
@@ -25,5 +25,3 @@ class User_Roles(Base):
             'user_access_level': self.user_acess_level,
             'created_at': self.created_at
         }
-    
-    

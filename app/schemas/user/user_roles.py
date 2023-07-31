@@ -17,8 +17,8 @@ class UserRole_Base(BaseModel):
 
 # Schema for Update of User_Role
 class UserRole_Update(UserRole_Base):
-    id: Optional[int] = None
-    user_role: str
+    id: Optional[int]
+    user_role: Optional[str]
     user_access_level: bool
 
 
