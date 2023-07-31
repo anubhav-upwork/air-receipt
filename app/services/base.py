@@ -52,3 +52,4 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_obj = self.db_session.query(self.model).get(id)
         self.db_session.delete(db_obj)
         self.db_session.commit()
+
