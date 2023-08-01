@@ -9,6 +9,7 @@ SQLALCHEMY_DATABASE_URL = "mysql://anubhav:anubhav123@localhost:3307/air"
 # engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True, pool_pre_ping=True)
 engine = create_engine(SQLALCHEMY_DATABASE_URL, pool_pre_ping=True)
 
+
 @lru_cache
 def create_session() -> scoped_session:
     Session = scoped_session(
@@ -33,10 +34,6 @@ def get_session() -> Generator[scoped_session, None, None]:
         yield Session
     finally:
         Session.remove()
-
-
-
-
 
 # engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 #
