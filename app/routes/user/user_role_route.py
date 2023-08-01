@@ -1,11 +1,8 @@
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
-
-# from app.db.dbconnect import get_session
 from app.models.user.user_roles import User_Roles
 from app.schemas.user.user_roles import UserRole, UserRole_Create, UserRole_Update
 from app.services.user import get_user_role_service, UserRoleService
-
 
 router = APIRouter(prefix="/roles")
 
@@ -22,10 +19,29 @@ async def create_role(role: UserRole_Create,
     return user_role_service.create(role)
 
 
-# @router.post("/login", response_model=schemas.Token)
-# def login(user_login: schemas.UserLogin, db: Session = Depends(get_db)):
-#     access_token = services.authenticate_user(db, user_login)
-#
-#     if access_token is None:
-#         raise HTTPException(status_code=400, detail="Invalid email or password")
-#     return {"access_token": access_token, "token_type": "Bearer"}
+@router.patch("/update_access_level", status_code=201, response_model=UserRole)
+async def update_access_level(role: UserRole_Update,
+                              user_role_service: UserRoleService = Depends(get_user_role_service)) -> User_Roles:
+    print("update : ", role)
+    existing_role = user_role_service.get_by_role(role=role.user_role)
+    if not existing_role:
+        raise HTTPException(
+            status_code=400, detail="Role does not exist"
+        )
+    return user_role_service.update(existing_role.id, role)
+
+
+@router.get("/", status_code=201, response_model=List[UserRole])
+async def list_orders(user_roles_service: UserRoleService = Depends(get_user_role_service)) -> List[User_Roles]:
+    return user_roles_service.list()
+
+
+@router.delete("/{user_role}", status_code=201, response_model=UserRole)
+async def delete_role(user_role: str, user_roles_service: UserRoleService = Depends(get_user_role_service)) -> User_Roles:
+    existing_role = user_roles_service.get_by_role(role=user_role)
+    if not existing_role:
+        raise HTTPException(
+            status_code=400, detail="Role does not exist"
+        )
+    return user_roles_service.delete(existing_role.id)
+

@@ -3,7 +3,6 @@ from typing import Any, Optional
 import sqlalchemy
 from typing import Optional, Union, Dict, Any
 
-from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 from app.models.user.user_roles import User_Roles
 from app.schemas.user.user_roles import UserRole_Create, UserRole_Update
@@ -17,7 +16,6 @@ class UserRoleService(BaseService[User_Roles, UserRole_Create, UserRole_Update])
         super(UserRoleService, self).__init__(User_Roles, db_session)
 
     def get_by_role(self, role: str) -> Optional[User_Roles]:
-        print(f"get_by_role, {role}")
         return self.db_session.query(User_Roles).filter(User_Roles.user_role == role).first()
 
     def create(self, obj_in: UserRole_Create) -> User_Roles:
@@ -37,29 +35,6 @@ class UserRoleService(BaseService[User_Roles, UserRole_Create, UserRole_Update])
         self.db_session.refresh(db_obj)
         return db_obj
 
-    # def update_by_role(self, db_obj: User_Roles, obj_in: Union[UserRole_Update, Dict[str, Any]]) -> User_Roles:
-    #     if isinstance(obj_in, dict):
-    #         update_data = obj_in
-    #     else:
-    #         update_data = obj_in.dict(exclude_unset=True)
-    #     if update_data["user_access_level"]:
-    #         user_access_level = update_data["user_access_level"]
-    #         del update_data["user_access_level"]
-    #         update_data["user_access_level"] = user_access_level
-    #
-    #     obj_data = jsonable_encoder(db_obj)
-    #     if isinstance(obj_in, dict):
-    #         update_data = obj_in
-    #     else:
-    #         update_data = obj_in.dict(exclude_unset=True)
-    #     for field in obj_data:
-    #         if field in update_data:
-    #             setattr(db_obj, field, update_data[field])
-    #     db.add(db_obj)
-    #     db.commit()
-    #     db.refresh(db_obj)
-    #     return db_obj
-    #     return super().update(self.db_session, db_obj=db_obj, obj_in=update_data)
 
 # from typing import Optional, Union, Dict, Any
 #

@@ -31,10 +31,10 @@ class UserRole_Create(UserRole_Base):
 
 # Schema for User Role Retrieval
 class UserRole(UserRole_Base):
-    # id: int
+    id: int
     user_role: str
     user_access_level: int
-    # created_at: datetime
+    created_at: datetime
 
     class Config:
         orm_mode = True
