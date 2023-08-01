@@ -2,8 +2,8 @@ from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel, EmailStr, condecimal
 from app.schemas.schema_utils import to_camel
-from app.schemas.user.user_roles import User_Role
-from app.schemas.user.user_types import User_Type
+from app.schemas.user.user_roles import UserRole
+from app.schemas.user.user_types import UserType
 
 
 class UserInfo_Base(BaseModel):
@@ -18,8 +18,6 @@ class UserInfo_Base(BaseModel):
     user_credit: condecimal(decimal_places=2)
     user_is_deleted: bool
     user_is_active: bool
-    created_at: datetime
-    updated_at: datetime
 
     class Config:
         alias_generator = to_camel
@@ -35,11 +33,11 @@ class UserInfo_Update(UserInfo_Base):
     user_credit: Optional[condecimal(decimal_places=2)]
     user_is_deleted: Optional[bool]
     user_is_active: Optional[bool]
-    updated_at: datetime = datetime.now()
+    # updated_at: datetime = datetime.now()
 
 
 class UserInfo_Create(UserInfo_Base):
-    user_id: str
+    # user_id: str
     user_name: str
     user_email: EmailStr
     user_mobile: str
@@ -50,8 +48,8 @@ class UserInfo_Create(UserInfo_Base):
     user_credit: condecimal(decimal_places=2)
     user_is_deleted: bool
     user_is_active: bool
-    created_at: datetime = datetime.now()
-    updated_at: datetime = datetime.now()
+    # created_at: datetime = datetime.now()
+    # updated_at: datetime = datetime.now()
 
     class Config:
         orm_mode = True
@@ -59,7 +57,7 @@ class UserInfo_Create(UserInfo_Base):
         allow_population_by_field_name = True
 
 
-class User_Info(UserInfo_Base):
+class UserInfo(UserInfo_Base):
     user_id: str
     user_name: str
     user_email: EmailStr

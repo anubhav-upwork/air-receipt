@@ -1,5 +1,4 @@
 import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import Column, types, ForeignKey, PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
 from app.db.dbconnect import Base
@@ -36,13 +35,4 @@ class User_Info(Base):
     def __repr__(self):
         return f"User_Info({self.id}, {self.user_name}, {self.user_credit}, {self.created_at})"
 
-    def set_password(self, password):
-        """Create hashed password."""
-        self.user_password = generate_password_hash(
-            password,
-            method='sha256'
-        )
 
-    def check_password(self, password):
-        """Check hashed password."""
-        return check_password_hash(self.user_password, password)
