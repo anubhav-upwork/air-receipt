@@ -18,8 +18,8 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         self.model = model
         self.db_session = db_session
 
-    def get(self, id: Any) -> Optional[ModelType]:
-        obj: Optional[ModelType] = self.db_session.query(self.model).get(id)
+    def get(self, _id: Any) -> Optional[ModelType]:
+        obj: Optional[ModelType] = self.db_session.query(self.model).get(_id)
         if obj is None:
             raise HTTPException(status_code=404, detail="Not Found")
         return obj
@@ -41,15 +41,16 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 raise e
         return db_obj
 
-    def update(self, id: Any, obj: UpdateSchemaType) -> Optional[ModelType]:
-        db_obj = self.get(id)
+    def update(self, _id: Any, obj: UpdateSchemaType) -> Optional[ModelType]:
+        db_obj = self.get(_id)
         for column, value in obj.dict(exclude_unset=True).items():
             setattr(db_obj, column, value)
         self.db_session.commit()
         return db_obj
 
-    def delete(self, id: Any) -> None:
-        db_obj = self.db_session.query(self.model).get(id)
+    def delete(self, _id: Any) -> Optional[ModelType]:
+        db_obj = self.db_session.query(self.model).get(_id)
         self.db_session.delete(db_obj)
         self.db_session.commit()
+        return db_obj
 
