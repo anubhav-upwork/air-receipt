@@ -9,7 +9,12 @@ from sqlalchemy.orm import Session
 from app.db.dbconnect import get_session
 
 from .user_roles import UserRoleService
+from .user_types import UserTypeService
 
 
 def get_user_role_service(db_session: Session = Depends(get_session)) -> UserRoleService:
     return UserRoleService(db_session)
+
+
+def get_user_type_service(db_session: Session = Depends(get_session)) -> UserTypeService:
+    return UserTypeService(db_session)
