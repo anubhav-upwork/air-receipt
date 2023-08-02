@@ -12,7 +12,7 @@ class User_Roles(Base):
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
 
     # user role and info relationship
-    # u_info = relationship("User_Info", back_populates="u_role")
+    u_info = relationship("User_Info", back_populates="u_role")
 
     def __repr__(self):
         return f"User_Roles({self.id}, {self.user_role}, {self.user_acess_level}, {self.created_at})"

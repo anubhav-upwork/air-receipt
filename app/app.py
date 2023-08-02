@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from app.db.dbconnect import engine, Base
 from fastapi.responses import JSONResponse
+from app.models.user.user_roles import User_Roles
+from app.models.user.user_types import User_Types
+from app.models.user.user_info import User_Info
 
+# Base.metadata.drop_all(engine)
 Base.metadata.create_all(bind=engine)
 
 
