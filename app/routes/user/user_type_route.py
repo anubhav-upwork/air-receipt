@@ -4,7 +4,7 @@ from app.models.user.user_types import User_Types
 from app.schemas.user.user_types import UserType, UserType_Create, UserType_Update
 from app.services.user import get_user_type_service, UserTypeService
 
-router = APIRouter(prefix="/user_types")
+router = APIRouter(prefix="/user_types", tags=["Type"])
 
 
 @router.post("/create_type", status_code=201, response_model=UserType)
