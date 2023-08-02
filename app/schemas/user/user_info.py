@@ -37,7 +37,7 @@ class UserInfo_Update(UserInfo_Base):
 
 
 class UserInfo_Create(UserInfo_Base):
-    # user_id: str
+    user_id: str
     user_name: str
     user_email: EmailStr
     user_mobile: str
@@ -46,8 +46,8 @@ class UserInfo_Create(UserInfo_Base):
     user_role: int
     user_type: int
     user_credit: condecimal(decimal_places=2)
-    user_is_deleted: bool
-    user_is_active: bool
+    user_is_deleted: bool = False
+    user_is_active: bool = True
     # created_at: datetime = datetime.now()
     # updated_at: datetime = datetime.now()
 

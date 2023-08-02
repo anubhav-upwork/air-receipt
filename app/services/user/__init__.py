@@ -10,7 +10,7 @@ from app.db.dbhelper import get_session
 
 from .user_roles import UserRoleService
 from .user_types import UserTypeService
-# from .user_info import UserInfoService
+from .user_info import UserInfoService
 
 
 def get_user_role_service(db_session: Session = Depends(get_session)) -> UserRoleService:
@@ -21,5 +21,5 @@ def get_user_type_service(db_session: Session = Depends(get_session)) -> UserTyp
     return UserTypeService(db_session)
 
 
-# def get_user_info_service(db_session: Session = Depends(get_session)) -> UserInfoService:
-#     return UserInfoService(db_session)
+def get_user_info_service(db_session: Session = Depends(get_session)) -> UserInfoService:
+    return UserInfoService(db_session)

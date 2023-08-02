@@ -27,8 +27,10 @@ def create_app() -> FastAPI:
 
     from app.routes.user import user_role_route
     from app.routes.user import user_type_route
+    from app.routes.user import user_info_route
 
     app.include_router(user_role_route.router)
     app.include_router(user_type_route.router)
+    app.include_router(user_info_route.router)
     # app.include_router(stores.router)
     return app
