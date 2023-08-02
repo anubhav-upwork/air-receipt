@@ -30,7 +30,7 @@ async def update_access_level(user_type: UserType_Update,
 
 
 @router.get("/", status_code=201, response_model=List[UserType])
-async def list_orders(user_type_service: UserTypeService = Depends(get_user_type_service)) -> List[User_Types]:
+async def list_user_types(user_type_service: UserTypeService = Depends(get_user_type_service)) -> List[User_Types]:
     return user_type_service.list()
 
 
