@@ -22,11 +22,12 @@ class UserInfoService(BaseService[User_Info, UserInfo_Create, UserInfo_Update]):
     def get_by_mobile(self, umobile: str) -> Optional[User_Info]:
         return self.db_session.query(User_Info).filter(User_Info.user_mobile == umobile).first()
 
-    def get_credit(self, uemail: str) -> Optional[User_Info.user_credit]:
+    def get_credit(self, uemail: str) -> float:
         return self.db_session.query(User_Info).filter(User_Info.user_email == uemail).first().user_credit
 
     def create(self, obj_in: UserInfo_Create) -> User_Info:
         db_obj = User_Info(
+            user_id = obj_in.user_id,
             user_name=obj_in.user_name,
             user_email=obj_in.user_email,
             user_mobile=obj_in.user_mobile,
