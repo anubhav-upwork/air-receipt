@@ -23,3 +23,13 @@ async def create_role(uinfo: UserInfo_Create,
 async def list_users(user_info_service: UserInfoService = Depends(get_user_info_service)) -> List[User_Info]:
     return user_info_service.list()
 
+
+@router.patch("/update_user", status_code=201, response_model=UserInfo_Update)
+async def update_user(uinfo: UserInfo_Update,
+                      user_info_service: UserInfoService = Depends(get_user_info_service)) -> User_Info:
+    existing_user_email = user_info_service.get_by_email(uemail=uinfo.user_email)
+    if not existing_user_email:
+        raise HTTPException(
+            status_code=400, detail="User does not exist"
+        )
+    return user_info_service.update(existing_user_email.id, uinfo)

@@ -27,7 +27,6 @@ class UserInfoService(BaseService[User_Info, UserInfo_Create, UserInfo_Update]):
 
     def create(self, obj_in: UserInfo_Create) -> User_Info:
         db_obj = User_Info(
-            user_id = obj_in.user_id,
             user_name=obj_in.user_name,
             user_email=obj_in.user_email,
             user_mobile=obj_in.user_mobile,
