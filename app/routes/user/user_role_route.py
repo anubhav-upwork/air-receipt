@@ -32,7 +32,7 @@ async def update_access_level(role: UserRole_Update,
 
 
 @router.get("/", status_code=201, response_model=List[UserRole])
-async def list_roles(user_roles_service: UserRoleService = Depends(get_user_role_service)) -> List[User_Roles]:
+async def list_user_roles(user_roles_service: UserRoleService = Depends(get_user_role_service)) -> List[User_Roles]:
     return user_roles_service.list()
 
 

@@ -8,7 +8,7 @@ router = APIRouter(prefix="/user", tags=["User"])
 
 
 @router.post("/create_user", status_code=201, response_model=UserInfo)
-async def create_role(uinfo: UserInfo_Create,
+async def create_user(uinfo: UserInfo_Create,
                       user_info_service: UserInfoService = Depends(get_user_info_service)) -> User_Info:
     existing_user_email = user_info_service.get_by_email(uemail=uinfo.user_email)
     existing_user_mobile = user_info_service.get_by_mobile(umobile=uinfo.user_mobile)

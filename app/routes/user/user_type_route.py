@@ -8,7 +8,7 @@ router = APIRouter(prefix="/user_types", tags=["Type"])
 
 
 @router.post("/create_type", status_code=201, response_model=UserType)
-async def create_role(utype: UserType_Create,
+async def create_type(utype: UserType_Create,
                       user_type_service: UserTypeService = Depends(get_user_type_service)) -> User_Types:
     existing_type = user_type_service.get_by_type(utype=utype.user_type)
     if existing_type:
@@ -19,7 +19,7 @@ async def create_role(utype: UserType_Create,
 
 
 @router.patch("/update_usage_limit", status_code=201, response_model=UserType)
-async def update_access_level(user_type: UserType_Update,
+async def update_usage_limit(user_type: UserType_Update,
                               user_type_service: UserTypeService = Depends(get_user_type_service)) -> User_Types:
     existing_type = user_type_service.get_by_type(utype=user_type.user_type)
     if not existing_type:
@@ -35,7 +35,7 @@ async def list_user_types(user_type_service: UserTypeService = Depends(get_user_
 
 
 @router.delete("/{user_type}", status_code=201, response_model=UserType)
-async def delete_role(user_type: str,
+async def delete_type(user_type: str,
                       user_type_service: UserTypeService = Depends(get_user_type_service)) -> User_Types:
     existing_type = user_type_service.get_by_type(utype=user_type)
     if not existing_type:
