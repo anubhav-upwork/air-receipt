@@ -5,16 +5,17 @@ from sqlalchemy.orm import relationship
 from app.db.dbconnect import Base
 
 
-class DocumentClass(str, enum.Enum):
+class Doc_Class(str, enum.Enum):
     invoice = "INVOICE"
     receipt = "RECEIPT"
+    credit_note = "CREDIT_NOTE"
     other = "OTHER"
 
 
 class Document_Class(Base):
     __tablename__ = "document_class"
     id = Column(types.Integer, primary_key=True, index=True)
-    doc_class = Column(types.String(150), nullable=False)
+    doc_class = Column(types.Enum(Doc_Class), nullable=False)
     doc_class_code = Column(types.Integer, nullable=False)
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
 
