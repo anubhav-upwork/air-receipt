@@ -1,3 +1,4 @@
+import enum
 from datetime import datetime
 from typing import Optional
 from pydantic import BaseModel
@@ -6,7 +7,7 @@ from app.schemas.schema_utils import to_camel
 
 # Schema of User Type Base Class
 class DocumentClass_Base(BaseModel):
-    doc_class: str
+    doc_class: enum.Enum
     doc_class_code: int
 
     class Config:
@@ -16,7 +17,7 @@ class DocumentClass_Base(BaseModel):
 
 # Schema for Update of User_Type
 class DocumentClass_Update(DocumentClass_Base):
-    doc_class: Optional[str]
+    doc_class: Optional[enum.Enum]
     doc_class_code: Optional[int]
 
 
@@ -28,7 +29,7 @@ class DocumentClass_Create(DocumentClass_Base):
 # Schema for User Type Retrieval
 class DocumentClass(DocumentClass_Base):
     id: int
-    doc_class: str
+    doc_class: enum.Enum
     doc_class_code: int
     created_at: datetime
 

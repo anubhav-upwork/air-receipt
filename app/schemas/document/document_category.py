@@ -28,8 +28,6 @@ class DocumentCategory_Create(DocumentCategory_Base):
 # Schema for User Type Retrieval
 class DocumentCategory(DocumentCategory_Base):
     id: int
-    user_type: str
-    usage_limit_days: int
     created_at: datetime
 
     class Config:
