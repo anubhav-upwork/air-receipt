@@ -8,19 +8,22 @@ from app.db.dbconnect import Base
 class DocumentClass(str, enum.Enum):
     invoice = "INVOICE"
     receipt = "RECEIPT"
-    other   = "OTHER"
+    other = "OTHER"
+
 
 class Document_Class(Base):
     __tablename__ = "document_class"
-    id = Column(types.Integer, primary_key=True)
+    id = Column(types.Integer, primary_key=True, index=True)
     doc_class = Column(types.String(150), nullable=False)
     doc_class_code = Column(types.Integer, nullable=False)
-    created_at = Column(types.DateTime, default=datetime.datetime.now)
-    class_doc_rel = relationship('Document_User', backref = "doc_class_rel")
-    
+    created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
+
+    document_usr = relationship("Document_User", primaryjoin="Document_Class.id == Document_User.document_class",
+                                cascade="all, delete-orphan")
+
     def __repr__(self):
         return f"Document_Class({self.id}, {self.doc_class}, {self.doc_class_code}, {self.created_at})"
-        
+
     @property
     def to_json(self):
         return {
@@ -29,4 +32,3 @@ class Document_Class(Base):
             'doc_class_code': self.doc_class_code,
             'created_at': self.created_at
         }
-    
