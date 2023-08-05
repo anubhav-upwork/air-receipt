@@ -28,12 +28,12 @@ def test_connection():
         return result.fetchone()
 
 
-def get_session() -> Generator[scoped_session, None, None]:
-    Session = create_session()
-    try:
-        yield Session
-    finally:
-        Session.remove()
+# def get_session() -> Generator[scoped_session, None, None]:
+#     Session = create_session()
+#     try:
+#         yield Session
+#     finally:
+#         Session.remove()
 
 # engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 #

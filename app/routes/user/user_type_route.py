@@ -4,7 +4,7 @@ from app.models.user.user_types import User_Types
 from app.schemas.user.user_types import UserType, UserType_Create, UserType_Update
 from app.services.user import get_user_type_service, UserTypeService
 
-router = APIRouter(prefix="/user_types")
+router = APIRouter(prefix="/user_types", tags=["Type"])
 
 
 @router.post("/create_type", status_code=201, response_model=UserType)
@@ -30,7 +30,7 @@ async def update_access_level(user_type: UserType_Update,
 
 
 @router.get("/", status_code=201, response_model=List[UserType])
-async def list_orders(user_type_service: UserTypeService = Depends(get_user_type_service)) -> List[User_Types]:
+async def list_user_types(user_type_service: UserTypeService = Depends(get_user_type_service)) -> List[User_Types]:
     return user_type_service.list()
 
 

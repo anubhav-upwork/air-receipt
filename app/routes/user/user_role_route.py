@@ -4,7 +4,7 @@ from app.models.user.user_roles import User_Roles
 from app.schemas.user.user_roles import UserRole, UserRole_Create, UserRole_Update
 from app.services.user import get_user_role_service, UserRoleService
 
-router = APIRouter(prefix="/roles")
+router = APIRouter(prefix="/roles", tags=["Role"])
 
 
 @router.post("/create_role", status_code=201, response_model=UserRole)
@@ -32,7 +32,7 @@ async def update_access_level(role: UserRole_Update,
 
 
 @router.get("/", status_code=201, response_model=List[UserRole])
-async def list_orders(user_roles_service: UserRoleService = Depends(get_user_role_service)) -> List[User_Roles]:
+async def list_roles(user_roles_service: UserRoleService = Depends(get_user_role_service)) -> List[User_Roles]:
     return user_roles_service.list()
 
 
