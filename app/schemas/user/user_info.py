@@ -20,7 +20,7 @@ class UserInfo_Base(BaseModel):
 
     class Config:
         alias_generator = to_camel
-        allow_population_by_field_name = True
+        populate_by_name = True
 
 
 class UserInfo_Update(UserInfo_Base):
@@ -35,7 +35,7 @@ class UserInfo_Update(UserInfo_Base):
     user_is_active: Optional[bool]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class UserInfo_Create(UserInfo_Base):
@@ -54,9 +54,9 @@ class UserInfo_Create(UserInfo_Base):
     # updated_at: datetime = datetime.now()
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         alias_generator = to_camel
-        allow_population_by_field_name = True
+        populate_by_name = True
 
 
 class UserInfo(UserInfo_Base):
@@ -75,6 +75,6 @@ class UserInfo(UserInfo_Base):
     updated_at: datetime = None
 
     class Config:
-        orm_mode = True
+        from_attributes = True
         alias_generator = to_camel
-        allow_population_by_field_name = True
+        populate_by_name = True

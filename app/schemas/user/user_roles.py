@@ -12,7 +12,7 @@ class UserRole_Base(BaseModel):
 
     class Config:
         alias_generator = to_camel
-        allow_population_by_field_name = True
+        populate_by_name = True
 
 
 # Schema for Update of User_Role
@@ -37,4 +37,4 @@ class UserRole(UserRole_Base):
     created_at: datetime
 
     class Config:
-        orm_mode = True
+        from_attributes = True
