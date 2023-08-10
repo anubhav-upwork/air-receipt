@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
-from app.api.security import hash_password, validate_password
+from app.core.security import hash_password, validate_password
 from app.crud.base import BaseService
 from app.models.user.user_info import User_Info
 from app.schemas.user.user_info import UserInfo_Create, UserInfo_Update
@@ -56,5 +56,5 @@ class UserInfoService(BaseService[User_Info, UserInfo_Create, UserInfo_Update]):
         return user
 
 
-userInfoCrud = UserInfoService(User_Info)
+get_user_info_service = UserInfoService(User_Info)
 

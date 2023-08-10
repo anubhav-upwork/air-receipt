@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr, condecimal
+from pydantic import BaseModel, condecimal
 from app.schemas.schema_utils import to_camel
 from app.schemas.user.user_roles import UserRole, UserRole_Base
 from app.schemas.user.user_types import UserType
@@ -8,7 +8,7 @@ from app.schemas.user.user_types import UserType
 
 class UserInfo_Base(BaseModel):
     user_name: str
-    user_email: EmailStr
+    user_email: str
     user_mobile: str
     user_location: Optional[str]
     user_password: str
@@ -39,14 +39,14 @@ class UserInfo_Update(UserInfo_Base):
 
 
 class UserInfo_Create(UserInfo_Base):
-    user_name: str
-    user_email: EmailStr
-    user_mobile: str
+    user_name: str = "user_name"
+    user_email: str = "user@example.com"
+    user_mobile: str = "91890890"
     user_location: Optional[str]
     user_password: str
-    user_role: int
-    user_type: int
-    user_credit: condecimal(decimal_places=2)
+    user_role: int = 1
+    user_type: int = 1
+    user_credit: condecimal(decimal_places=2) = 1.00
     user_is_deleted: bool = False
     user_is_active: bool = True
 
@@ -62,7 +62,7 @@ class UserInfo_Create(UserInfo_Base):
 class UserInfo(UserInfo_Base):
     id: int
     user_name: str
-    user_email: EmailStr
+    user_email: str
     user_mobile: str
     user_location: Optional[str]
     user_password: str

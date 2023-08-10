@@ -17,7 +17,6 @@ class UserType_Base(BaseModel):
 
 # Schema for Update of User_Type
 class UserType_Update(UserType_Base):
-    id: Optional[int] = None
     user_type: Optional[str]
     usage_limit_days: int
 

@@ -4,13 +4,13 @@
 """
 __author__ = 'Anubhav Rohatgi'
 
-from fastapi import Depends
-from sqlalchemy.orm import Session
-from app.db.dbhelper import get_session
+# from fastapi import Depends
+# from sqlalchemy.orm import Session
+# from app.db.session import SessionLocal
 
-from .user_roles import userRoleCrud
-from .user_types import userTypeCrud
-from .user_info import userInfoCrud
+from .user_roles import get_user_role_service
+from .user_types import get_user_type_service
+from .user_info import get_user_info_service
 
 
 # def get_user_role_service(db_session: Session = Depends(get_session)) -> UserRoleService:

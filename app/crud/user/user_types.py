@@ -33,4 +33,4 @@ class UserTypeService(BaseService[User_Types, UserType_Create, UserType_Update])
         return db_obj
 
 
-userTypeCrud = UserTypeService(User_Types)
+get_user_type_service = UserTypeService(User_Types)

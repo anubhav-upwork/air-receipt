@@ -34,5 +34,5 @@ class UserRoleService(BaseService[User_Roles, UserRole_Create, UserRole_Update])
         return db_obj
 
 
-userRoleCrud = UserRoleService(User_Roles)
+get_user_role_service = UserRoleService(User_Roles)
 

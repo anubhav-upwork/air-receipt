@@ -1,5 +1,6 @@
 from fastapi import FastAPI
-from app.db.dbconnect import engine, Base
+from app.db.session import engine
+from app.db.base_class import Base
 from fastapi.responses import JSONResponse
 from app.models.user.user_roles import User_Roles
 from app.models.user.user_types import User_Types
@@ -31,9 +32,9 @@ def create_app() -> FastAPI:
         base_error_message = f"Failed to execute: {request.method}: {request.url}"
         return JSONResponse(status_code=400, content={"message": f"{base_error_message}. Detail: {err}"})
 
-    from app.routes.user import user_role_route
-    from app.routes.user import user_type_route
-    from app.routes.user import user_info_route
+    from app.api.api_v1.endpoints.user import user_role_route
+    from app.api.api_v1.endpoints.user import user_type_route
+    from app.api.api_v1.endpoints.user import user_info_route
 
     app.include_router(user_role_route.router)
     app.include_router(user_type_route.router)
