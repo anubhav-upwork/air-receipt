@@ -3,7 +3,7 @@ import enum
 from werkzeug.security import generate_password_hash
 from sqlalchemy import Column, types, ForeignKey, PrimaryKeyConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship
-from app.db.dbconnect import Base
+from app.db.base_class import Base
 
 
 class DocumentSrc(str, enum.Enum):

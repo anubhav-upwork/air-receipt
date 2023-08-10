@@ -2,7 +2,7 @@ import datetime
 import enum
 from sqlalchemy import Column, types
 from sqlalchemy.orm import relationship
-from app.db.dbconnect import Base
+from app.db.base_class import Base
 
 
 class Doc_Class(str, enum.Enum):

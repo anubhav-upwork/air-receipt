@@ -1,6 +1,6 @@
 import datetime
 from sqlalchemy import Column, types, ForeignKey
-from app.db.dbconnect import Base
+from app.db.base_class import Base
 from app.models.documents.document_user import DocumentState
 
 
