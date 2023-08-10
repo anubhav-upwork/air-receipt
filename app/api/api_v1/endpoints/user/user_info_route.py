@@ -22,8 +22,8 @@ async def create_user(uinfo: UserInfo_Create,
 
 
 @router.get("/", status_code=201, response_model=List[UserInfo])
-async def list_users( db: Session = Depends(deps.get_db)) -> List[User_Info]:
-    return get_user_info_service.list(db)
+async def list_users(db: Session = Depends(deps.get_db)) -> List[User_Info]:
+    return get_user_info_service.list(db_session=db)
 
 
 @router.patch("/update_user", status_code=201, response_model=UserInfo_Update)

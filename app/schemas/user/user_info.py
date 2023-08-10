@@ -72,7 +72,7 @@ class UserInfo(UserInfo_Base):
     user_is_deleted: bool
     user_is_active: bool
     created_at: datetime
-    updated_at: datetime = None
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
