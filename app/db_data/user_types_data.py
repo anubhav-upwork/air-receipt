@@ -10,5 +10,9 @@ USER_TYPES_DATA = [
     {
         "user_type": "trail",
         "usage_limit_days": 1
+    },
+    {
+        "user_type": "lifetime",
+        "usage_limit_days": -1
     }
 ]
