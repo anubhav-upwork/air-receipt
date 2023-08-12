@@ -14,8 +14,10 @@ def init() -> None:
 
 def main() -> None:
     logger.info("Creating initial data, populating tables")
-    init()
-    logger.info("Initial data created in tables created")
+    if init():
+        logger.info("Initial data created in tables created")
+    else:
+        logger.warning("Initial data exists in the schema")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@ class User_Info(Base):
     user_credit = Column(types.Numeric(12, 2), nullable=False)
     user_is_deleted = Column(types.Boolean, nullable=False, default=False)
     user_is_active = Column(types.Boolean, nullable=False, default=True)
+    user_is_superuser = Column(types.Boolean, nullable=False, default=False)
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
     updated_at = Column(types.DateTime(timezone=True), nullable=True, onupdate=datetime.datetime.now())
 

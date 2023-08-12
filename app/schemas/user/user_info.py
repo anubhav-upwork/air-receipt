@@ -59,6 +59,15 @@ class UserInfo_Create(UserInfo_Base):
         populate_by_name = True
 
 
+class UserInfoSuper_Create(UserInfo_Base):
+    user_is_superuser: bool = False
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
 class UserInfo(UserInfo_Base):
     id: int
     user_name: str
