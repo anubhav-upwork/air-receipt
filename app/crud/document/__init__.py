@@ -3,3 +3,5 @@
   Created by Anubhav Rohatgi on 24/07/2023.
 """
 __author__ = 'Anubhav Rohatgi'
+
+from .document_class import get_document_class_service

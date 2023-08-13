@@ -16,7 +16,7 @@ class Document_Class(Base):
     __tablename__ = "document_class"
     id = Column(types.Integer, primary_key=True, index=True)
     doc_class = Column(types.Enum(Doc_Class), nullable=False)
-    doc_class_code = Column(types.Integer, nullable=False)
+    doc_class_code = Column(types.Integer, nullable=False, unique=True)
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
 
     document_usr = relationship("Document_User", primaryjoin="Document_Class.id == Document_User.document_class",
