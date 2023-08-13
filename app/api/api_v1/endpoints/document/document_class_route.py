@@ -17,6 +17,11 @@ async def create_doc_class(dc: DocumentClass_Create,
                                                                          doc_class_code=dc.doc_class_code)
     if existing_class or existing_class_code:
         raise HTTPException(
-            status_code=400, detail="Role or Code already exists"
+            status_code=400, detail="Document Class or Code already exists"
         )
     return get_document_class_service.create(db_session=db, obj_in=dc)
+
+
+@router.get("/", status_code=201, response_model=List[DocumentClass])
+async def list_doc_class(db: Session = Depends(deps.get_db)) -> List[Document_Class]:
+    return get_document_class_service.list(db_session=db)

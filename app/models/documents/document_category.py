@@ -8,7 +8,7 @@ class Document_Category(Base):
     __tablename__ = "document_category"
     id = Column(types.Integer, primary_key=True, index=True)
     category = Column(types.String(150), nullable=False)
-    category_code = Column(types.Integer, nullable=False)
+    category_code = Column(types.Integer, nullable=False, unique=True)
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
     document_usr = relationship("Document_User",
                                 primaryjoin="Document_Category.id == Document_User.document_category_code",
