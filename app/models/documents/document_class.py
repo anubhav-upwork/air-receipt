@@ -19,8 +19,8 @@ class Document_Class(Base):
     doc_class_code = Column(types.Integer, nullable=False, unique=True)
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
 
-    document_usr = relationship("Document_User", primaryjoin="Document_Class.id == Document_User.document_class",
-                                cascade="all, delete-orphan")
+    # document_usr = relationship("Document_User", primaryjoin="Document_Class.id == Document_User.document_class",
+    #                             cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Document_Class({self.id}, {self.doc_class}, {self.doc_class_code}, {self.created_at})"

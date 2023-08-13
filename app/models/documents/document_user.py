@@ -52,9 +52,9 @@ class Document_User(Base):
     updated_at = Column(types.DateTime(timezone=True), nullable=True,
                         onupdate=datetime.datetime.now())
 
-    document_audit = relationship("Document_Audit_Trail",
-                                  primaryjoin="Document_User.document_id == Document_Audit_Trail.document_id",
-                                  cascade="all, delete-orphan")
+    # document_audit = relationship("Document_Audit_Trail",
+    #                               primaryjoin="Document_User.document_id == Document_Audit_Trail.document_id",
+    #                               cascade="all, delete-orphan")
 
     def set_document_id(self, filename):
         """Create hashed password."""
