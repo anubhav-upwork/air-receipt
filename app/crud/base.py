@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException
 
-from app.db.dbconnect import Base
+from app.db.base_class import Base
 
 ModelType = TypeVar("ModelType", bound=Base)
 CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
@@ -14,43 +14,41 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
 class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
-    def __init__(self, model: Type[ModelType], db_session: Session):
+    def __init__(self, model: Type[ModelType]):
         self.model = model
-        self.db_session = db_session
 
-    def get(self, _id: Any) -> Optional[ModelType]:
-        obj: Optional[ModelType] = self.db_session.query(self.model).get(_id)
+    def get(self, db_session: Session, _id: Any) -> Optional[ModelType]:
+        obj: Optional[ModelType] = db_session.query(self.model).get(_id)
         if obj is None:
             raise HTTPException(status_code=404, detail="Not Found")
         return obj
 
-    def list(self) -> List[ModelType]:
-        objs: List[ModelType] = self.db_session.query(self.model).all()
+    def list(self, db_session: Session) -> List[ModelType]:
+        objs: List[ModelType] = db_session.query(self.model).all()
         return objs
 
-    def create(self, obj: CreateSchemaType) -> ModelType:
+    def create(self, db_session: Session, obj: CreateSchemaType) -> ModelType:
         db_obj: ModelType = self.model(**obj.dict())
-        self.db_session.add(db_obj)
+        db_session.add(db_obj)
         try:
-            self.db_session.commit()
+            db_session.commit()
         except sqlalchemy.exc.IntegrityError as e:
-            self.db_session.rollback()
+            db_session.rollback()
             if "duplicate key" in str(e):
                 raise HTTPException(status_code=409, detail="Conflict Error")
             else:
                 raise e
         return db_obj
 
-    def update(self, _id: Any, obj: UpdateSchemaType) -> Optional[ModelType]:
-        db_obj = self.get(_id)
+    def update(self, db_session: Session, _id: Any, obj: UpdateSchemaType) -> Optional[ModelType]:
+        db_obj = self.get(db_session, _id)
         for column, value in obj.dict(exclude_unset=True).items():
             setattr(db_obj, column, value)
-        self.db_session.commit()
+        db_session.commit()
         return db_obj
 
-    def delete(self, _id: Any) -> Optional[ModelType]:
-        db_obj = self.db_session.query(self.model).get(_id)
-        self.db_session.delete(db_obj)
-        self.db_session.commit()
+    def delete(self, db_session: Session, _id: Any) -> Optional[ModelType]:
+        db_obj = db_session.query(self.model).get(_id)
+        db_session.delete(db_obj)
+        db_session.commit()
         return db_obj
-

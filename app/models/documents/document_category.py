@@ -1,16 +1,18 @@
 import datetime
 from sqlalchemy import Column, types
 from sqlalchemy.orm import relationship
-from app.db.dbconnect import Base
+from app.db.base_class import Base
 
 
 class Document_Category(Base):
     __tablename__ = "document_category"
-    id = Column(types.Integer, primary_key=True)
+    id = Column(types.Integer, primary_key=True, index=True)
     category = Column(types.String(150), nullable=False)
-    category_code = Column(types.Integer, nullable=False)
-    created_at = Column(types.DateTime, default=datetime.datetime.now)
-    category_doc_rel = relationship('Document_User', backref="doc_cat_rel")
+    category_code = Column(types.Integer, nullable=False, unique=True)
+    created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
+    document_usr = relationship("Document_User",
+                                primaryjoin="Document_Category.id == Document_User.document_category_code",
+                                cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Document_Category({self.id}, {self.category}, {self.category_code}, {self.created_at})"
