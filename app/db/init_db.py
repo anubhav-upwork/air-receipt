@@ -84,32 +84,31 @@ def init_db(db: Session) -> bool:
         logger.warning(f"Initial User already exists{e}")
         return False
 
-    # # Populate Document Category Data
-    # for docCat in DOCUMENT_CATEGORY_DATA:
-    #     obj = DocumentCategory_Create(
-    #         category=docCat["category"],
-    #         category_code=docCat["category_code"]
-    #     )
-    #
-    #     try:
-    #         document.get_document_category_service.create(db, obj)
-    #         logger.info(f"Document Category Created {obj}")
-    #     except Exception as e:
-    #         logger.warning(f"Document Category already exists{e}")
-    #         return False
-    #
-    # for docClass in DOCUMENT_CLASS_DATA:
-    #     obj = DocumentClass_Create(
-    #         doc_class=docClass["doc_class"],
-    #         doc_class_code=docClass["doc_class_code"]
-    #     )
-    #
-    #     try:
-    #         document.get_document_class_service.create(db, obj)
-    #         logger.info(f"Document Class Created {obj}")
-    #     except Exception as e:
-    #         logger.warning(f"Document Class already exists{e}")
-    #         return False
+    # Populate Document Category Data
+    for docCat in DOCUMENT_CATEGORY_DATA:
+        obj = DocumentCategory_Create(
+            category=docCat["category"],
+            category_code=docCat["category_code"]
+        )
+
+        try:
+            document.get_document_category_service.create(db, obj)
+            logger.info(f"Document Category Created {obj}")
+        except Exception as e:
+            logger.warning(f"Document Category already exists{e}")
+            return False
+
+    for docClass in DOCUMENT_CLASS_DATA:
+        obj = DocumentClass_Create(
+            doc_class=docClass["doc_class"],
+            doc_class_code=docClass["doc_class_code"]
+        )
+        try:
+            document.get_document_class_service.create(db, obj)
+            logger.info(f"Document Class Created {obj}")
+        except Exception as e:
+            logger.warning(f"Document Class already exists{e}")
+            return False
 
 # def init_db(db: Session) -> None:
 #     # Tables should be created with Alembic migrations
