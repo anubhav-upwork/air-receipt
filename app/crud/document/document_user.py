@@ -4,6 +4,7 @@ from typing import Optional, List
 from sqlalchemy.orm import Session
 from app.models.documents.document_user import DocumentSrc, DocumentType, DocumentReview, DocumentState, Document_User
 from app.schemas.document.document_user import DocumentUser_Update, DocumentUser_Create, DocumentUser
+from app.models.documents.document_class import Document_Class, Doc_Class
 from app.crud.base import BaseService
 from sqlalchemy.exc import IntegrityError
 from starlette.exceptions import HTTPException
@@ -33,13 +34,17 @@ class DocumentUserService(BaseService[Document_User, DocumentUser_Create, Docume
             document_location=obj_in.document_location,
             document_password=obj_in.document_password,
             document_category_code=obj_in.document_category_code,
-            document_pages=obj_in.document_pages,
             document_state=obj_in.document_state,
-            document_confidence=obj_in.document_confidence,
             document_review=obj_in.document_review,
-            document_is_deleted=obj_in.document_is_deleted,
-            document_process_time_sec=obj_in.document_process_time_sec
+            document_is_deleted=False,
         )
+
+        # Check for Foreign Associations and validate
+        doc_class_exists = db_session.query(Document_Class).filter(Document_Class.id == obj_in.document_class).first()
+
+        if not doc_class_exists:
+            raise HTTPException(status_code=400, detail=f"Document Class Type does not exist {obj_in.document_class} ")
+
         db_session.add(db_obj)
         try:
             db_session.commit()

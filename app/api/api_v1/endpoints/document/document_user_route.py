@@ -1,9 +1,9 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
 from sqlalchemy.orm import Session
 from app.models.user.user_info import User_Info
 from app.models.documents.document_user import Document_User, DocumentSrc, DocumentType, DocumentState, DocumentReview
-from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update
+from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, DocumentUser_Upload
 from app.crud.document.document_user import get_document_user_service
 from app.crud.document.document_category import get_document_category_service
 from app.crud.user.user_info import get_user_info_service
@@ -13,10 +13,12 @@ from app.api import deps
 router = APIRouter(prefix="/documents", tags=["Document"])
 
 
-@router.post("/create_document", status_code=201, response_model=DocumentUser)
-async def create_document(dc: DocumentUser_Create,
+@router.post("/upload_document", status_code=201, response_model=DocumentUser)
+async def upload_document(du: DocumentUser_Upload,
+                          # file: UploadFile = File(...),
                           db: Session = Depends(deps.get_db),
                           cur_user: User_Info = Depends(deps.get_current_user)) -> Document_User:
+    dc = du["params"]
     file_name_hash = generate_password_hash(dc.document_id, method='md5')
     existing_filehash = get_document_user_service.get_by_doc_id(db_session=db, doc_id=file_name_hash)
     # existing_class_code = get_document_class_service.get_by_docclasscode(db_session=db,
