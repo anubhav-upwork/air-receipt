@@ -37,12 +37,13 @@ def create_app() -> FastAPI:
     # from app.api.api_v1.endpoints.user import user_info_route
 
     from app.api.api_v1.endpoints.document import document_class_route, document_category_route
-
+    from app.api.api_v1.endpoints.user import user_auth
     app.include_router(user_role_route.router)
     app.include_router(user_type_route.router)
     app.include_router(user_info_route.router)
     app.include_router(document_class_route.router)
     app.include_router(document_category_route.router)
+    app.include_router(user_auth.router)
 
     # app.include_router(stores.router)
     return app
