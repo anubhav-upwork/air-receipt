@@ -9,7 +9,7 @@ from app.core.auth import oauth2_scheme, JWT_SECRET, ALGORITHM
 # from app.core.config import settings
 from app.db.session import SessionLocal
 from app.models.user.user_info import User_Info
-from app import crud
+from app.crud.user import get_user_info_service
 
 
 class TokenData(BaseModel):
@@ -56,7 +56,7 @@ async def get_current_user(
 def get_current_active_superuser(
     current_user: User_Info = Depends(get_current_user),
 ) -> User_Info:
-    if not crud.user.is_superuser(current_user):
+    if not get_user_info_service.is_superuser(current_user):
         raise HTTPException(
             status_code=400, detail="The user doesn't have enough privileges"
         )
