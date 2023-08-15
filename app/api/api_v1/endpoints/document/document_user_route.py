@@ -26,6 +26,7 @@ async def create_document(dc: DocumentUser_Create,
             status_code=400, detail="Document Class or Code already exists"
         )
 
+    dc.user_id = cur_user.id
     dc.document_id = file_name_hash
     return get_document_user_service.create(db_session=db, obj_in=dc)
 
