@@ -22,6 +22,9 @@ class UserInfoService(BaseService[User_Info, UserInfo_Create, UserInfo_Update]):
     def get_credit(self, db_session: Session, uemail: str) -> float:
         return db_session.query(User_Info).filter(User_Info.user_email == uemail).first().user_credit
 
+    def is_superuser(self, user: User_Info) -> bool:
+        return user.user_is_superuser
+
     def create(self, db_session: Session, obj_in: UserInfo_Create) -> User_Info:
         db_obj = User_Info(
             user_name=obj_in.user_name,
