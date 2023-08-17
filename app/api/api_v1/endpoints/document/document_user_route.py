@@ -32,9 +32,17 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
     existing_filehash = get_document_user_service.get_by_doc_id(db_session=db, doc_id=file_name_hash)
     existing_class_code = get_document_class_service.get_by_docclassId(db_session=db,
                                                                        doc_class_id=du.document_class)
+    existing_category_code = get_document_category_service.get_by_doccatcode(db_session=db,
+                                                                             code=du.document_category_code)
+
     if not existing_class_code:
         raise HTTPException(
             status_code=400, detail="Document Class does not exist!"
+        )
+
+    if not existing_category_code:
+        raise HTTPException(
+            status_code=400, detail=f"Document Category {du.document_category_code} does not exist !"
         )
 
     if existing_filehash:
@@ -51,7 +59,7 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         document_class=du.document_class,
         document_location=du.document_location,
         document_password=du.document_password,
-        document_category_code=du.document_category_code,
+        document_category_code=existing_category_code.id,
         document_state=du.document_state,
         document_review=du.document_review,
         document_is_deleted=du.document_is_deleted
