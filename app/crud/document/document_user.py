@@ -28,6 +28,7 @@ class DocumentUserService(BaseService[Document_User, DocumentUser_Create, Docume
         db_obj = Document_User(
             user_id=obj_in.user_id,
             document_id=obj_in.document_id,  # this should be unique always
+            document_filename=obj_in.document_filename,
             document_source=obj_in.document_source,
             document_type=obj_in.document_type,
             document_class=obj_in.document_class,
@@ -36,7 +37,7 @@ class DocumentUserService(BaseService[Document_User, DocumentUser_Create, Docume
             document_category_code=obj_in.document_category_code,
             document_state=obj_in.document_state,
             document_review=obj_in.document_review,
-            document_is_deleted=False,
+            document_is_deleted=False
         )
 
         # Check for Foreign Associations and validate

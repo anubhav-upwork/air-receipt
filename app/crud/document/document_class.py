@@ -11,10 +11,13 @@ from starlette.exceptions import HTTPException
 
 class DocumentClassService(BaseService[Document_Class, DocumentClass_Create, DocumentClass_Update]):
 
+    def get_by_docclassId(self, db_session: Session, doc_class_id: int) -> Optional[Document_Class]:
+        return db_session.query(Document_Class).filter(Document_Class.id == doc_class_id).one_or_none()
+
     def get_by_docclass(self, db_session: Session, doc_class: Doc_Class) -> Optional[Document_Class]:
         return db_session.query(Document_Class).filter(Document_Class.doc_class == doc_class).first()
 
-    def get_by_docclasscode(self, db_session: Session, doc_class_code: int) -> Optional[Document_Class]:
+    def get_by_docclassCode(self, db_session: Session, doc_class_code: int) -> Optional[Document_Class]:
         return db_session.query(Document_Class).filter(Document_Class.doc_class_code == doc_class_code).first()
 
     def create(self, db_session: Session, obj_in: DocumentClass_Create) -> Document_Class:

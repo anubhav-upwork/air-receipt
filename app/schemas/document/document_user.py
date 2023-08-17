@@ -7,7 +7,7 @@ from app.models.documents.document_user import DocumentSrc, DocumentType, Docume
 
 # Schema of User Type Base Class
 class DocumentUser_Base(BaseModel):
-    document_id: Optional[str]
+    document_id: Optional[str] = None
 
     class Config:
         alias_generator = to_camel
@@ -35,11 +35,12 @@ class DocumentUser_Update(DocumentUser_Base):
 class DocumentUser_Create(DocumentUser_Base):
     user_id: int
     document_id: str
+    document_filename: Optional[str] = None
     document_source: DocumentSrc = DocumentSrc.upload
     document_type: DocumentType = DocumentType.not_scanned
     document_class: int = 1
-    document_location: Optional[str]
-    document_password: Optional[str]
+    document_location: Optional[str] = None
+    document_password: Optional[str] = None
     document_category_code: int = 1
     document_state: DocumentState = DocumentState.created
     document_review: DocumentReview = DocumentReview.not_required
@@ -51,8 +52,21 @@ class DocumentUser_Create(DocumentUser_Base):
         populate_by_name = True
 
 
-class DocumentUser_Upload(BaseModel):
-    params: DocumentUser_Create
+class DocumentUser_Upload(DocumentUser_Base):
+    document_source: DocumentSrc = DocumentSrc.upload
+    document_type: DocumentType = DocumentType.not_scanned
+    document_class: int = 1
+    document_location: Optional[str] = None
+    document_password: Optional[str] = None
+    document_category_code: int = 1
+    document_state: DocumentState = DocumentState.created
+    document_review: DocumentReview = DocumentReview.not_required
+    document_is_deleted: bool = False
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
 
 
 # Schema for User Type Retrieval
@@ -60,11 +74,18 @@ class DocumentUser(DocumentUser_Base):
     id: int
     user_id: int
     document_id: str
+    document_filename: str
     document_source: DocumentSrc
     document_type: DocumentType
     document_class: int
+    document_location: Optional[str] = None
+    document_password: Optional[str] = None
     document_category_code: int
     document_state: DocumentState
+    document_confidence: Optional[float]
+    document_review: DocumentReview
+    document_is_deleted: bool
+    document_process_time_sec: Optional[float]
     created_at: datetime
     updated_at: Optional[datetime] = None
 
