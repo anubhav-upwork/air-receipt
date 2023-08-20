@@ -8,9 +8,9 @@ from app.db.base_class import Base
 class User_Action(str, enum.Enum):
     login = "LOGIN"
     logout = "LOGOUT"
-    token_expire = "TOKEN_EXPIRE"
-    token_request = "TOKEN_REQUEST"
-
+    update = "UPDATE_INFO"
+    credit_load = "CREDIT_LOAD"
+    credit_payout = "CREDIT_PAYOUT"
     doc_upload = "DOC_UPLOAD"
     doc_review = "DOC_REVIEW"
     doc_delete = "DOC_DELETE"

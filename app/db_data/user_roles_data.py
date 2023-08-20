@@ -1,3 +1,10 @@
+"""
+    SUPERADMIN = 2
+    USER = 1
+    TENANT = 0
+    REVIEWER = -1
+"""
+
 USER_ROLES_DATA = [
     {
         "user_role": "superadmin",
@@ -14,5 +21,10 @@ USER_ROLES_DATA = [
         "user_access_level": 0
         # Little access, can upload - Temporary user for trial purpose, once trial done promoted to user, can be used
         # for marketing
+    },
+    {
+        "user_role": "reviewer",
+        "user_access_level": -1
+        # No access apart from reviewing documents
     }
 ]
