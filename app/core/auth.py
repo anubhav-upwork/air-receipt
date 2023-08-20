@@ -16,7 +16,7 @@ JWT_SECRET: str = "TEST_SECRET_DO_NOT_USE_IN_PROD"
 ALGORITHM: str = "HS256"
 
 # 60 minutes * 24 hours * 8 days = 8 days
-ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
 
 JWTPayloadMapping = MutableMapping[
     str, Union[datetime, bool, str, List[str], List[int]]
