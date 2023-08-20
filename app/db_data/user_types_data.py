@@ -8,7 +8,7 @@ USER_TYPES_DATA = [
         "usage_limit_days": 30
     },
     {
-        "user_type": "trail",
+        "user_type": "trial",
         "usage_limit_days": 1
     },
     {

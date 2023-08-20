@@ -3,7 +3,7 @@ FIRST_USER_DATA = {
     "user_email": "rohatgianubhav@gmail.com",
     "user_mobile": "8800689655",
     "user_location": "Gurgaon",
-    "user_password": "anubhav@123@321",
+    "user_password": "anubhav@123@321$air$sujit",
     "user_role": 1,  # superadmin
     "user_type": 4,  # lifetime
     "user_credit": 1000000.00,
