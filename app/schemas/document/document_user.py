@@ -69,6 +69,16 @@ class DocumentUser_Upload(DocumentUser_Base):
         populate_by_name = True
 
 
+class DocumentUser_Delete(DocumentUser_Base):
+    user_id: int
+    document_id: str
+    document_is_delete: bool
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
 # Schema for User Type Retrieval
 class DocumentUser(DocumentUser_Base):
     id: int

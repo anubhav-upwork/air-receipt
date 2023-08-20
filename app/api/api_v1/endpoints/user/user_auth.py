@@ -83,6 +83,6 @@ def create_user_signup(
             status_code=400,
             detail="The user with this email already exists in the system",
         )
-    user = get_user_info_service.create(db=db, obj_in=user_in)
+    user = get_user_info_service.create(db_session=db, obj_in=user_in)
 
     return user

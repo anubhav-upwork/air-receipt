@@ -109,6 +109,8 @@ def init_db(db: Session) -> bool:
             logger.warning(f"Document Class already exists{e}")
             # return False
 
+    return True
+
 
 # def init_db(db: Session) -> None:
 #     # Tables should be created with Alembic migrations
