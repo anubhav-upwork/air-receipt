@@ -1,5 +1,6 @@
-import logging
+from app.core.airlogger import logger
 from sqlalchemy.orm import Session
+
 from app.crud import user
 from app.schemas.user.user_roles import UserRole_Create
 from app.schemas.user.user_types import UserType_Create
@@ -20,8 +21,6 @@ from app.db_data.first_user_data import FIRST_USER_DATA
 # DOCUMENT Data
 from app.db_data.document_class_data import DOCUMENT_CLASS_DATA
 from app.db_data.document_category_data import DOCUMENT_CATEGORY_DATA
-
-logger = logging.getLogger(__name__)
 
 
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
@@ -46,7 +45,7 @@ def init_db(db: Session) -> bool:
             logger.info(f"Role Created {obj}")
         except Exception as e:
             logger.warning(f"Role already exists{e}")
-            return False
+            # return False
 
     # populate user types
     for utype in USER_TYPES_DATA:
@@ -60,7 +59,7 @@ def init_db(db: Session) -> bool:
             logger.info(f"User Type Created {obj}")
         except Exception as e:
             logger.warning(f"User Type already exists{e}")
-            return False
+            # return False
 
     # create first user
     obj_first_user = UserInfoSuper_Create(
@@ -96,7 +95,7 @@ def init_db(db: Session) -> bool:
             logger.info(f"Document Category Created {obj}")
         except Exception as e:
             logger.warning(f"Document Category already exists{e}")
-            return False
+            # return False
 
     for docClass in DOCUMENT_CLASS_DATA:
         obj = DocumentClass_Create(
@@ -108,7 +107,8 @@ def init_db(db: Session) -> bool:
             logger.info(f"Document Class Created {obj}")
         except Exception as e:
             logger.warning(f"Document Class already exists{e}")
-            return False
+            # return False
+
 
 # def init_db(db: Session) -> None:
 #     # Tables should be created with Alembic migrations
