@@ -14,7 +14,6 @@ from app.crud.document.document_user import get_document_user_service
 from app.crud.document.document_category import get_document_category_service
 from app.crud.document.document_class import get_document_class_service
 
-
 router = APIRouter(prefix="/documents", tags=["Document"])
 
 
@@ -23,7 +22,6 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
                           file: UploadFile = File(...),
                           db: Session = Depends(deps.get_db),
                           cur_user: User_Info = Depends(deps.get_current_user)) -> Document_User:
-
     _file_save_path = str(settings.UPLOAD_PATH) + "/" + str(cur_user.id)
     logger.info(f"Document Received: from:{cur_user.id}, file:{file.filename},"
                 f" State:{du.document_state},"
@@ -102,3 +100,28 @@ async def list_user_documents(db: Session = Depends(deps.get_db),
                               cur_user: User_Info = Depends(deps.get_current_user)
                               ) -> List[Document_User]:
     return get_document_user_service.list_by_user_id(db_session=db, user_id=cur_user.id)
+
+
+@router.patch("/update", status_code=201, response_model=DocumentUser)
+async def update_document(du: DocumentUser_Update,
+                          db: Session = Depends(deps.get_db),
+                          cur_user: User_Info = Depends(deps.get_current_user)
+                          ) -> Document_User:
+
+    existing_filehash = get_document_user_service.get_by_doc_id(db_session=db, doc_id=du.document_id)
+    if not existing_filehash:
+        raise HTTPException(
+            status_code=400, detail=f"Document with filename {du.document_id} does not exist!"
+        )
+
+    return get_document_user_service.update(db_session=db, _id=existing_filehash.id, obj=du)
+
+
+# @router.patch("/delete", status_code=201, response_model=DocumentUser)
+# async def delete_document(du: DocumentUser_Update,
+#                           db: Session = Depends(deps.get_db),
+#                           cur_user: User_Info = Depends(deps.get_current_user)
+#                           ) -> Document_User:
+#
+#
+#     return get_document_user_service.list_by_user_id(db_session=db, user_id=cur_user.id)
