@@ -6,14 +6,14 @@ from app.schemas.document.document_class import DocumentClass, DocumentClass_Cre
 from app.crud.document.document_class import get_document_class_service
 from app.api import deps
 
-router = APIRouter(prefix="/doc-class", tags=["Document"])
+router = APIRouter(prefix="/doc-class", tags=["Document Class"])
 
 
 @router.post("/create_doc_class", status_code=201, response_model=DocumentClass)
 async def create_doc_class(dc: DocumentClass_Create,
                            db: Session = Depends(deps.get_db)) -> Document_Class:
     existing_class = get_document_class_service.get_by_docclass(db_session=db, doc_class=dc.doc_class)
-    existing_class_code = get_document_class_service.get_by_docclasscode(db_session=db,
+    existing_class_code = get_document_class_service.get_by_docclassCode(db_session=db,
                                                                          doc_class_code=dc.doc_class_code)
     if existing_class or existing_class_code:
         raise HTTPException(

@@ -1,19 +1,26 @@
-import logging
+from app.core.airlogger import logger
 from sqlalchemy.orm import Session
+
 from app.crud import user
 from app.schemas.user.user_roles import UserRole_Create
 from app.schemas.user.user_types import UserType_Create
 from app.schemas.user.user_info import UserInfoSuper_Create
 
+from app.crud import document
+from app.schemas.document.document_class import DocumentClass_Create
+from app.schemas.document.document_category import DocumentCategory_Create
+
 from app.db.session import engine
 from app.db.base_class import Base
 
-# Data
+# USER Data
 from app.db_data.user_roles_data import USER_ROLES_DATA
 from app.db_data.user_types_data import USER_TYPES_DATA
 from app.db_data.first_user_data import FIRST_USER_DATA
 
-logger = logging.getLogger(__name__)
+# DOCUMENT Data
+from app.db_data.document_class_data import DOCUMENT_CLASS_DATA
+from app.db_data.document_category_data import DOCUMENT_CATEGORY_DATA
 
 
 # make sure all SQL Alchemy models are imported (app.db.base) before initializing DB
@@ -38,7 +45,7 @@ def init_db(db: Session) -> bool:
             logger.info(f"Role Created {obj}")
         except Exception as e:
             logger.warning(f"Role already exists{e}")
-            return False
+            # return False
 
     # populate user types
     for utype in USER_TYPES_DATA:
@@ -52,7 +59,7 @@ def init_db(db: Session) -> bool:
             logger.info(f"User Type Created {obj}")
         except Exception as e:
             logger.warning(f"User Type already exists{e}")
-            return False
+            # return False
 
     # create first user
     obj_first_user = UserInfoSuper_Create(
@@ -75,6 +82,35 @@ def init_db(db: Session) -> bool:
     except Exception as e:
         logger.warning(f"Initial User already exists{e}")
         return False
+
+    # Populate Document Category Data
+    for docCat in DOCUMENT_CATEGORY_DATA:
+        obj = DocumentCategory_Create(
+            category=docCat["category"],
+            category_code=docCat["category_code"]
+        )
+
+        try:
+            document.get_document_category_service.create(db, obj)
+            logger.info(f"Document Category Created {obj}")
+        except Exception as e:
+            logger.warning(f"Document Category already exists{e}")
+            # return False
+
+    for docClass in DOCUMENT_CLASS_DATA:
+        obj = DocumentClass_Create(
+            doc_class=docClass["doc_class"],
+            doc_class_code=docClass["doc_class_code"]
+        )
+        try:
+            document.get_document_class_service.create(db, obj)
+            logger.info(f"Document Class Created {obj}")
+        except Exception as e:
+            logger.warning(f"Document Class already exists{e}")
+            # return False
+
+    return True
+
 
 # def init_db(db: Session) -> None:
 #     # Tables should be created with Alembic migrations

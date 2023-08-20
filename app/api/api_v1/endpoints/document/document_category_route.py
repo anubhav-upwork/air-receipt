@@ -6,7 +6,7 @@ from app.schemas.document.document_category import DocumentCategory, DocumentCat
 from app.crud.document.document_category import get_document_category_service
 from app.api import deps
 
-router = APIRouter(prefix="/doc-category", tags=["Document"])
+router = APIRouter(prefix="/doc-category", tags=["Document Category"])
 
 
 @router.post("/create_doc_category", status_code=201, response_model=DocumentCategory)

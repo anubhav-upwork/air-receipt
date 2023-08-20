@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-SQLALCHEMY_DATABASE_URL = "mysql://anubhav:anubhav123@localhost:3307/air"
+SQLALCHEMY_DATABASE_URL = "mysql://anubhav:anubhav123@localhost:3307/new_schema"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL,

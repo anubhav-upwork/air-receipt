@@ -42,7 +42,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     def update(self, db_session: Session, _id: Any, obj: UpdateSchemaType) -> Optional[ModelType]:
         db_obj = self.get(db_session, _id)
-        for column, value in obj.dict(exclude_unset=True).items():
+        for column, value in obj.model_dump(exclude_unset=True).items():
             setattr(db_obj, column, value)
         db_session.commit()
         return db_obj

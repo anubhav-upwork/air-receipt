@@ -36,6 +36,7 @@ class Document_User(Base):
     id = Column(types.Integer, primary_key=True, index=True)
     user_id = Column(types.Integer, ForeignKey('user_info.id'), nullable=False)
     document_id = Column(types.String(150), nullable=False, unique=True)
+    document_filename = Column(types.String(250), nullable=True)
     document_source = Column(types.Enum(DocumentSrc), nullable=False)
     document_type = Column(types.Enum(DocumentType), nullable=False)
     document_class = Column(types.Integer, ForeignKey('document_class.id'), nullable=False)
@@ -52,13 +53,7 @@ class Document_User(Base):
     updated_at = Column(types.DateTime(timezone=True), nullable=True,
                         onupdate=datetime.datetime.now())
 
-    document_audit = relationship("Document_Audit_Trail",
-                                  primaryjoin="Document_User.document_id == Document_Audit_Trail.document_id",
-                                  cascade="all, delete-orphan")
+    # document_audit = relationship("Document_Audit_Trail",
+    #                               primaryjoin="Document_User.document_id == Document_Audit_Trail.document_id",
+    #                               cascade="all, delete-orphan")
 
-    def set_document_id(self, filename):
-        """Create hashed password."""
-        self.document_id = generate_password_hash(
-            filename,
-            method='md5'
-        )

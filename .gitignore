@@ -5,3 +5,4 @@ app/models/__pycache__/
 app/models/user/__pycache__/
 /.vscode/
 .idea/
+app/public/

@@ -21,10 +21,10 @@ class User_Info(Base):
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
     updated_at = Column(types.DateTime(timezone=True), nullable=True, onupdate=datetime.datetime.now())
 
-    userLogin = relationship("User_Login", primaryjoin="User_Info.id == User_Login.user_id",
-                             cascade="all, delete-orphan")
-    user_audit = relationship("User_Audit_Trail", primaryjoin="User_Info.id == User_Audit_Trail.user_id",
-                              cascade="all, delete-orphan")
+    # userLogin = relationship("User_Login", primaryjoin="User_Info.id == User_Login.user_id",
+    #                          cascade="all, delete-orphan")
+    # user_audit = relationship("User_Audit_Trail", primaryjoin="User_Info.id == User_Audit_Trail.user_id",
+    #                           cascade="all, delete-orphan")
 
     # document_usr = relationship("Document_User", primaryjoin="User_Info.id == Document_User.id",
     #                             cascade="all, delete-orphan")

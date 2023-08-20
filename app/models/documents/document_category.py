@@ -10,9 +10,9 @@ class Document_Category(Base):
     category = Column(types.String(150), nullable=False)
     category_code = Column(types.Integer, nullable=False, unique=True)
     created_at = Column(types.DateTime(timezone=True), nullable=False, default=datetime.datetime.now())
-    document_usr = relationship("Document_User",
-                                primaryjoin="Document_Category.id == Document_User.document_category_code",
-                                cascade="all, delete-orphan")
+    # document_usr = relationship("Document_User",
+    #                             primaryjoin="Document_Category.id == Document_User.document_category_code",
+    #                             cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"Document_Category({self.id}, {self.category}, {self.category_code}, {self.created_at})"
