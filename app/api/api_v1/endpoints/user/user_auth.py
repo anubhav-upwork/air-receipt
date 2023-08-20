@@ -103,15 +103,7 @@ async def add_credit(credit: condecimal(decimal_places=2),
                      db: Session = Depends(deps.get_db),
                      current_user: UserInfo = Depends(deps.get_current_user)) -> User_Info:
     uinfo = UserInfo_Update(
-        user_name=current_user.user_name,
-        user_mobile=current_user.user_mobile,
-        user_location=current_user.user_location,
-        user_password=current_user.user_password,
-        user_role=current_user.user_role,
-        user_type=current_user.user_type,
-        user_credit=current_user.user_credit + credit,
-        user_is_deleted=current_user.user_is_deleted,
-        user_is_active=current_user.user_is_active
+        user_credit=current_user.user_credit + credit
     )
     if credit < 1.00:
         raise HTTPException(
