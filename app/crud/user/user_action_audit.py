@@ -1,12 +1,11 @@
 import sqlalchemy
-from typing import Optional
-
-from sqlalchemy.orm import Session
-from app.models.user.user_action_audit import User_Audit_Trail, User_Action
-from app.schemas.user.user_action_audit import UserAuditTrail_Create, UserAuditTrail_Update, UserAuditTrail
-from app.crud.base import BaseService
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
+
+from app.crud.base import BaseService
+from app.models.user.user_action_audit import User_Audit_Trail
+from app.schemas.user.user_action_audit import UserAuditTrail_Create, UserAuditTrail_Update
 
 
 class UserActionAuditService(BaseService[User_Audit_Trail, UserAuditTrail_Create, UserAuditTrail_Update]):
