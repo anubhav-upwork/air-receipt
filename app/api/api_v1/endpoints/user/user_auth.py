@@ -54,6 +54,12 @@ def login(
 
     user_audit = get_user_action_audit_service.create(db, audit_log)
 
+    # also activate the user in user info
+    user_update = UserInfo_Update(
+        user_is_active=True
+    )
+    user_update_request = get_user_info_service.update(db, audit_log)
+
     return {
         "access_token": create_access_token(sub=user.user_email),
         "token_type": "bearer",

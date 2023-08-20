@@ -79,6 +79,7 @@ class DocumentUser_Delete(DocumentUser_Base):
         alias_generator = to_camel
         populate_by_name = True
 
+
 # Schema for User Type Retrieval
 class DocumentUser(DocumentUser_Base):
     id: int
@@ -91,6 +92,7 @@ class DocumentUser(DocumentUser_Base):
     document_location: Optional[str] = None
     document_password: Optional[str] = None
     document_category_code: int
+    document_pages: Optional[int]
     document_state: DocumentState
     document_confidence: Optional[float]
     document_review: DocumentReview
