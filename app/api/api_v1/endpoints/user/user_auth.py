@@ -58,7 +58,7 @@ def login(
     user_update = UserInfo_Update(
         user_is_active=True
     )
-    user_update_request = get_user_info_service.update(db, audit_log)
+    user_update_request = get_user_info_service.update(db, user_update)
 
     return {
         "access_token": create_access_token(sub=user.user_email),
