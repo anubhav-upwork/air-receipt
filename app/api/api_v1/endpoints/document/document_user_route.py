@@ -112,6 +112,15 @@ async def delete_document(document_id: str,
         raise HTTPException(
             status_code=400, detail=f"Document with filename {document_id} does not exist!"
         )
+    du = DocumentUser_Update(
+        document_is_deleted=True
+    )
+    _file_save_path = str(settings.UPLOAD_PATH) + "/" + str(cur_user.id) + "/" + document_id
+
+    if os.path.exists(_file_save_path):
+        os.remove(_file_save_path)
+    else:
+        logger.info(f"Failed to delete the file {_file_save_path}")
 
     return get_document_user_service.update(db_session=db, _id=existing_filehash.id, obj=du)
 

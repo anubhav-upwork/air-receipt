@@ -7,7 +7,6 @@ from app.models.documents.document_user import DocumentSrc, DocumentType, Docume
 
 # Schema of User Type Base Class
 class DocumentUser_Base(BaseModel):
-    document_id: Optional[str] = None
 
     class Config:
         alias_generator = to_camel
@@ -16,19 +15,22 @@ class DocumentUser_Base(BaseModel):
 
 # Schema for Update of Document_User
 class DocumentUser_Update(DocumentUser_Base):
-    document_id: str
-    document_source: Optional[DocumentSrc]
-    document_type: Optional[DocumentType]
-    document_class: Optional[int]
-    document_location: Optional[str]
-    document_password: Optional[str]
-    document_category_code: Optional[int]
-    document_pages: Optional[int] = 0
-    document_state: Optional[DocumentState]
-    document_confidence: Optional[float]
-    document_review: Optional[DocumentReview]
-    document_is_deleted: Optional[bool]
-    document_process_time_sec: Optional[float]
+    document_id: Optional[str] = None
+    document_source: Optional[DocumentSrc] = None
+    document_type: Optional[DocumentType] = None
+    document_class: Optional[int] = None
+    document_location: Optional[str] = None
+    document_password: Optional[str] = None
+    document_category_code: Optional[int] = None
+    document_pages: Optional[int] = None
+    document_state: Optional[DocumentState] = None
+    document_confidence: Optional[float] = None
+    document_review: Optional[DocumentReview] = None
+    document_is_deleted: Optional[bool] = None
+    document_process_time_sec: Optional[float] = None
+
+    class Config:
+        from_attributes = True
 
 
 # Schema for User Type Creation
