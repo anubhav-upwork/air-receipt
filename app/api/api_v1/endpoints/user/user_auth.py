@@ -58,7 +58,7 @@ def login(
     user_update = UserInfo_Update(
         user_is_active=True
     )
-    user_update_request = get_user_info_service.update(db, user_update)
+    user_update_request = get_user_info_service.update(db_session=db, _id=user.id, obj=user_update)
 
     return {
         "access_token": create_access_token(sub=user.user_email),
@@ -79,8 +79,7 @@ def read_users_me(db: Session = Depends(deps.get_db), current_user: UserInfo = D
     )
 
     user_audit = get_user_action_audit_service.create(db, audit_log)
-    user = current_user
-    return user
+    return current_user
 
 
 @router.post("/signup", response_model=UserInfo, status_code=201)
