@@ -5,22 +5,13 @@ from app.schemas.schema_utils import to_camel
 
 
 class UserInfo_Base(BaseModel):
-    # user_name: str
-    # user_email: EmailStr
-    # user_mobile: str
-    # user_location: Optional[str]
-    # user_password: str
-    # user_role: int
-    # user_type: int
-    # user_credit: condecimal(decimal_places=2)
-    # user_is_deleted: bool
-    # user_is_active: bool
 
     class Config:
         alias_generator = to_camel
         populate_by_name = True
 
 
+# write only those that are required to be filled up while the rows are updated
 class UserInfo_Update(UserInfo_Base):
     user_name: Optional[str] = None
     user_mobile: Optional[str] = None
@@ -54,6 +45,7 @@ class UserInfo_Create(UserInfo_Base):
         populate_by_name = True
 
 
+# Super User Row Pydantic
 class UserInfoSuper_Create(UserInfo_Base):
     user_name: str
     user_email: EmailStr
@@ -73,6 +65,7 @@ class UserInfoSuper_Create(UserInfo_Base):
         populate_by_name = True
 
 
+# Response Pydantic schema -- Show everything except password
 class UserInfo(UserInfo_Base):
     id: int
     user_name: str

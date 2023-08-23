@@ -8,7 +8,6 @@ from app.schemas.schema_utils import to_camel
 class UserRole_Base(BaseModel):
     user_role: str
     user_access_level: int
-    # created_at: datetime
 
     class Config:
         alias_generator = to_camel
@@ -26,10 +25,9 @@ class UserRole_Update(UserRole_Base):
 class UserRole_Create(UserRole_Base):
     user_role: str
     user_access_level: int = -1
-    # created_at = datetime.now()
 
 
-# Schema for User Role Retrieval
+# Schema for User Role Retrieval/Response
 class UserRole(UserRole_Base):
     id: int
     user_role: str
