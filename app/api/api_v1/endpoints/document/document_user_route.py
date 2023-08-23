@@ -10,9 +10,13 @@ from app.models.user.user_info import User_Info
 from app.models.documents.document_user import Document_User, DocumentSrc, DocumentType, DocumentState, DocumentReview
 from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
     DocumentUser_Upload
+from app.models.documents.document_action_audit import Document_Audit_Trail
+from app.schemas.document.document_audit_trail import DocumentAudit_Create
+
 from app.crud.document.document_user import get_document_user_service
 from app.crud.document.document_category import get_document_category_service
 from app.crud.document.document_class import get_document_class_service
+from app.crud.document.document_audit import get_document_audit_service
 
 router = APIRouter(prefix="/documents", tags=["Document"])
 
@@ -92,7 +96,18 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         document_is_deleted=du.document_is_deleted
     )
     # assign data from file
-    return get_document_user_service.create(db_session=db, obj_in=dc)
+    result_obj = get_document_user_service.create(db_session=db, obj_in=dc)
+
+    # Audit the document
+    # enter into user audit trail
+    audit_log = DocumentAudit_Create(
+        document_id=file_name_hash,
+        action=DocumentState.created,
+        action_msg=f"Document <{dc.document_filename} created by user {cur_user.user_name}> ."
+    )
+    doc_audit = get_document_audit_service.create(db, audit_log)
+
+    return result_obj
 
 
 @router.get("/document", status_code=201, response_model=List[DocumentUser])
