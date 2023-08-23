@@ -28,7 +28,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return objs
 
     def create(self, db_session: Session, obj: CreateSchemaType) -> ModelType:
-        db_obj: ModelType = self.model(**obj.dict())
+        db_obj: ModelType = self.model(**obj.model_dump())
         db_session.add(db_obj)
         try:
             db_session.commit()
@@ -38,6 +38,7 @@ class BaseService(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                 raise HTTPException(status_code=409, detail="Conflict Error")
             else:
                 raise e
+        db_session.refresh(db_obj)
         return db_obj
 
     def update(self, db_session: Session, _id: Any, obj: UpdateSchemaType) -> Optional[ModelType]:
