@@ -12,11 +12,13 @@ from app.core.security import validate_password
 logger = logging.getLogger(__name__)
 
 API_V1_STR: str = "/api/v1"
-JWT_SECRET: str = "TEST_SECRET_DO_NOT_USE_IN_PROD"
+JWT_SECRET: str = "a$$nubh@v_airalpha+$%%receipt+17JulvyTwo1000&23"
+JWT_REFRESH_SECRET_KEY: str = "charlie$%^&&saved_+the-d8123#anubhav#"
 ALGORITHM: str = "HS256"
 
 # 60 minutes * 24 hours * 8 days = 8 days
-ACCESS_TOKEN_EXPIRE_MINUTES: int = 10
+ACCESS_TOKEN_EXPIRE_MINUTES: int = 10  # 10 minutes
+REFRESH_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7  # 7 days
 
 JWTPayloadMapping = MutableMapping[
     str, Union[datetime, bool, str, List[str], List[int]]
@@ -26,10 +28,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 def authenticate(
-    *,
-    email: str,
-    password: str,
-    db: Session,
+        *,
+        email: str,
+        password: str,
+        db: Session,
 ) -> User_Info | None:
     user = db.query(User_Info).filter(User_Info.user_email == email).first()
     if not user:
@@ -50,9 +52,9 @@ def create_access_token(*, sub: str) -> str:
 
 
 def _create_token(
-    token_type: str,
-    lifetime: timedelta,
-    sub: str,
+        token_type: str,
+        lifetime: timedelta,
+        sub: str,
 ) -> str:
     payload = {}
     expire = datetime.utcnow() + lifetime
@@ -71,3 +73,14 @@ def _create_token(
     # subject of the JWT
     payload["sub"] = str(sub)
     return jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
+
+
+def create_refresh_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
+    if expires_delta is not None:
+        expires_delta = datetime.utcnow() + expires_delta
+    else:
+        expires_delta = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
+
+    to_encode = {"exp": expires_delta, "iat": datetime.utcnow(), "sub": str(subject)}
+    return jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, algorithm=ALGORITHM)
+
