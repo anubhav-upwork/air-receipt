@@ -21,12 +21,15 @@ class UserLogin_Base(BaseModel):
 #     class Config:
 #         from_attributes = True
 
+class UserLogin_Update(UserLogin_Base):
+    ...
+
 
 class UserLogin_Create(UserLogin_Base):
     user_id: int
     access_token: str
     refresh_token: str
-    status: bool = True
+    status: bool
     created_at: datetime = datetime.now()
 
     class Config:
