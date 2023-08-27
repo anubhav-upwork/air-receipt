@@ -1,13 +1,13 @@
 import logging
-from typing import Optional, MutableMapping, List, Union, Any, Type
 from datetime import datetime, timedelta
+from typing import MutableMapping, List, Union, Any
 
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm.session import Session
 from jose import jwt
+from sqlalchemy.orm.session import Session
 
-from app.models.user.user_info import User_Info
 from app.core.security import validate_password
+from app.models.user.user_info import User_Info
 
 logger = logging.getLogger(__name__)
 
@@ -75,12 +75,12 @@ def _create_token(
     return jwt.encode(payload, JWT_SECRET, algorithm=ALGORITHM)
 
 
-def create_refresh_token(subject: Union[str, Any], expires_delta: timedelta = None) -> str:
+def create_refresh_token(sub: Union[str, Any], expires_delta: timedelta = None) -> str:
     if expires_delta is not None:
         expires_delta = datetime.utcnow() + expires_delta
     else:
         expires_delta = datetime.utcnow() + timedelta(minutes=REFRESH_TOKEN_EXPIRE_MINUTES)
 
-    to_encode = {"exp": expires_delta, "iat": datetime.utcnow(), "sub": str(subject)}
+    to_encode = {"exp": expires_delta, "iat": datetime.utcnow(), "sub": str(sub)}
     return jwt.encode(to_encode, JWT_REFRESH_SECRET_KEY, algorithm=ALGORITHM)
 

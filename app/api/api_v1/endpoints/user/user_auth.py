@@ -2,21 +2,26 @@ from typing import Any
 from pydantic import condecimal
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm.session import Session
 
-# user info
-from app.crud.user import get_user_info_service, get_user_action_audit_service
+# user info,login
+from app.crud.user import get_user_info_service, get_user_action_audit_service, get_user_login_service
 from app.schemas.user.user_info import UserInfo, UserInfo_Create, UserInfo_Update
+from app.schemas.user.user_login import UserLogin, UserLogin_Update, UserLogin_Create
 
 # user audit
 from app.schemas.user.user_action_audit import UserAuditTrail_Create
 from app.models.user.user_action_audit import User_Action
 
 from app.api import deps
+from jose import jwt
 from app.core.auth import (
     authenticate,
     create_access_token,
+    create_refresh_token,
+    JWT_SECRET,
+    ALGORITHM
 )
 
 from app.models.user.user_info import User_Info
@@ -60,9 +65,20 @@ def login(
     )
     user_update_request = get_user_info_service.update(db_session=db, _id=user.id, obj=user_update)
 
+    access = create_access_token(sub=user.user_email)
+    refresh = create_refresh_token(sub=user.user_email)
+
+    user_login = UserLogin_Create(
+        user_id=user.id,
+        access_token=access,
+        refresh_token=refresh,
+        status=True
+    )
+    token_db = get_user_login_service.create(db_session=db, obj_in=user_login)
     return {
-        "access_token": create_access_token(sub=user.user_email),
-        "token_type": "bearer",
+        "access_token": access,
+        "refresh_token": refresh,
+        "token_type": "bearer"
     }
 
 
@@ -123,3 +139,29 @@ async def add_credit(credit: condecimal(decimal_places=2),
     )
     user_audit = get_user_action_audit_service.create(db, audit_log)
     return get_user_info_service.update(db_session=db, _id=current_user.id, obj=uinfo)
+
+
+@router.post('/logout')
+def logout(dependencies=Depends(OAuth2PasswordBearer), db: Session = Depends(deps.get_db)):
+    # token = dependencies
+    # payload = jwt.decode(token, JWT_SECRET, ALGORITHM)
+    # print(f"PAreload :::: {payload}")
+    # user_id = payload['sub']
+    # token_record = db.query(models.TokenTable).all()
+    # info = []
+    # for record in token_record:
+    #     print("record", record)
+    #     if (datetime.utcnow() - record.created_date).days > 1:
+    #         info.append(record.user_id)
+    # if info:
+    #     existing_token = db.query(models.TokenTable).where(TokenTable.user_id.in_(info)).delete()
+    #     db.commit()
+    #
+    # existing_token = db.query(models.TokenTable).filter(models.TokenTable.user_id == user_id,
+    #                                                     models.TokenTable.access_toke == token).first()
+    # if existing_token:
+    #     existing_token.status = False
+    #     db.add(existing_token)
+    #     db.commit()
+    #     db.refresh(existing_token)
+    return {"message": "Logout Successfully"}
