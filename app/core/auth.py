@@ -11,7 +11,6 @@ from app.models.user.user_info import User_Info
 
 logger = logging.getLogger(__name__)
 
-API_V1_STR: str = "/api/v1"
 JWT_SECRET: str = "a$$nubh@v_airalpha+$%%receipt+17JulvyTwo1000&23"
 JWT_REFRESH_SECRET_KEY: str = "charlie$%^&&saved_+the-d8123#anubhav#"
 ALGORITHM: str = "HS256"
