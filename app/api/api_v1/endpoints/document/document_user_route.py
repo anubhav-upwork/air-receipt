@@ -1,6 +1,6 @@
 import os
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
 from sqlalchemy.orm import Session
 from app.core.airlogger import logger
 from app.api import deps
@@ -21,7 +21,7 @@ from app.crud.document.document_audit import get_document_audit_service
 router = APIRouter(prefix="/documents", tags=["Document"])
 
 
-@router.post("/upload_document", status_code=201, response_model=DocumentUser)
+@router.post("/upload_document", status_code=status.HTTP_201_CREATED, response_model=DocumentUser)
 async def upload_document(du: DocumentUser_Upload = Depends(),
                           file: UploadFile = File(...),
                           db: Session = Depends(deps.get_db),
@@ -110,14 +110,14 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
     return result_obj
 
 
-@router.get("/document", status_code=201, response_model=List[DocumentUser])
+@router.get("/document", status_code=status.HTTP_200_OK, response_model=List[DocumentUser])
 async def list_user_documents(db: Session = Depends(deps.get_db),
                               cur_user: User_Info = Depends(deps.get_current_user)
                               ) -> List[Document_User]:
     return get_document_user_service.list_by_user_id(db_session=db, user_id=cur_user.id)
 
 
-@router.patch("/delete", status_code=201, response_model=DocumentUser)
+@router.patch("/delete", status_code=status.HTTP_201_CREATED, response_model=DocumentUser)
 async def delete_document(document_id: str,
                           db: Session = Depends(deps.get_db),
                           cur_user: User_Info = Depends(deps.get_current_user)

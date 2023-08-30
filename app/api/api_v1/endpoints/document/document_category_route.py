@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api import deps
@@ -13,7 +13,7 @@ from app.schemas.document.document_category import DocumentCategory, DocumentCat
 router = APIRouter(prefix="/doc-category", tags=["Document Category"])
 
 
-@router.post("/create_doc_category", status_code=201, response_model=DocumentCategory)
+@router.post("/create_doc_category", status_code=status.HTTP_201_CREATED, response_model=DocumentCategory)
 async def create_doc_category(dc: DocumentCategory_Create,
                               db: Session = Depends(deps.get_db),
                               cur_user: User_Info = Depends(deps.get_current_user)) -> Document_Category:
@@ -40,7 +40,7 @@ async def create_doc_category(dc: DocumentCategory_Create,
     return get_document_category_service.create(db_session=db, obj_in=dc)
 
 
-@router.get("/", status_code=201, response_model=List[DocumentCategory])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[DocumentCategory])
 async def list_doc_category(db: Session = Depends(deps.get_db),
                             cur_user: User_Info = Depends(deps.get_current_user)) -> List[Document_Category]:
     """

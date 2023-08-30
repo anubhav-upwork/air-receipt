@@ -9,18 +9,19 @@ from sqlalchemy import text
 # logger
 from app.core.airlogger import logger
 
-from app.models.user.user_roles import User_Roles
-from app.models.user.user_types import User_Types
-from app.models.user.user_info import User_Info
-from app.models.user.user_login import User_Login
-from app.models.user.user_action_audit import User_Audit_Trail
-from app.models.documents.document_category import Document_Category
-from app.models.documents.document_class import Document_Class
-from app.models.documents.document_user import Document_User
-from app.models.documents.document_action_audit import Document_Audit_Trail
 
-# Base.metadata.drop_all(engine)
-# Base.metadata.create_all(bind=engine)
+def create_tables():
+    from app.models.user.user_roles import User_Roles
+    from app.models.user.user_types import User_Types
+    from app.models.user.user_info import User_Info
+    from app.models.user.user_login import User_Login
+    from app.models.user.user_action_audit import User_Audit_Trail
+    from app.models.documents.document_category import Document_Category
+    from app.models.documents.document_class import Document_Class
+    from app.models.documents.document_user import Document_User
+    from app.models.documents.document_action_audit import Document_Audit_Trail
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(bind=engine)
 
 
 def create_app() -> FastAPI:
