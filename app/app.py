@@ -62,19 +62,18 @@ def create_app() -> FastAPI:
         return JSONResponse(status_code=400, content={"message": f"{base_error_message}. Detail: {err}"})
 
     from app.api.api_v1.endpoints.user import user_role_route, user_type_route, user_info_route
-    # from app.api.api_v1.endpoints.user import user_type_route
-    # from app.api.api_v1.endpoints.user import user_info_route
-
     from app.api.api_v1.endpoints.document import document_class_route, document_category_route, document_user_route
     from app.api.api_v1.endpoints.user import user_auth
 
+    # User Routes
     app.include_router(user_role_route.router)
     app.include_router(user_type_route.router)
     app.include_router(user_info_route.router)
+    app.include_router(user_auth.router)
+
+    # Document Routes
     app.include_router(document_class_route.router)
     app.include_router(document_category_route.router)
     app.include_router(document_user_route.router)
-    app.include_router(user_auth.router)
 
-    # app.include_router(stores.router)
     return app
