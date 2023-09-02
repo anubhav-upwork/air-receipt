@@ -1,11 +1,14 @@
+from datetime import datetime
 from typing import Any
 from pydantic import condecimal
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlalchemy.orm.session import Session
 
 # user info,login
+from app.models.user.user_info import User_Info
+from app.models.user.user_login import User_Login
 from app.crud.user import get_user_info_service, get_user_action_audit_service, get_user_login_service
 from app.schemas.user.user_info import UserInfo, UserInfo_Create, UserInfo_Update
 from app.schemas.user.user_login import UserLogin, UserLogin_Update, UserLogin_Create
@@ -13,9 +16,9 @@ from app.schemas.user.user_login import UserLogin, UserLogin_Update, UserLogin_C
 # user audit
 from app.schemas.user.user_action_audit import UserAuditTrail_Create
 from app.models.user.user_action_audit import User_Action
+from jose import jwt, JWTError
 
 from app.api import deps
-from jose import jwt
 from app.core.auth import (
     authenticate,
     create_access_token,
@@ -24,15 +27,11 @@ from app.core.auth import (
     ALGORITHM
 )
 
-from app.models.user.user_info import User_Info
-
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @router.post("/login", tags=["Authentication"])
-def login(
-        db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()
-) -> Any:
+def login(db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestForm = Depends()) -> Any:
     """
     Get the JWT for a user with data from OAuth2 request form body.
     """
@@ -43,11 +42,10 @@ def login(
         audit_log = UserAuditTrail_Create(
             user_id=1,
             action=User_Action.login,
-            action_msg=f"Some User tried to log in."
+            action_msg=f"Some User tried to log in with details {form_data.username}."
         )
 
         user_audit = get_user_action_audit_service.create(db, audit_log)
-
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     # enter into user audit trail
@@ -57,6 +55,7 @@ def login(
         action_msg=f"User <{user.user_name}> logged in."
     )
 
+    # commit to audit table
     user_audit = get_user_action_audit_service.create(db, audit_log)
 
     # also activate the user in user info
@@ -68,13 +67,21 @@ def login(
     access = create_access_token(sub=user.user_email)
     refresh = create_refresh_token(sub=user.user_email)
 
-    user_login = UserLogin_Create(
-        user_id=user.id,
-        access_token=access,
-        refresh_token=refresh,
-        status=True
-    )
-    token_db = get_user_login_service.create(db_session=db, obj_in=user_login)
+    # commit to user login token table, Check if a token already exists, if exists update otherwise create new
+    ulog = get_user_login_service.get_by_user_id(db_session=db, user_id=user.id)
+    if ulog is not None:
+        token_db = get_user_login_service.update(db_session=db, _id=ulog.access_token, obj=UserLogin_Update(
+            access_token=access,
+            refresh_token=refresh,
+            status=True
+        ))
+    else:
+        token_db = get_user_login_service.create(db_session=db, obj_in=UserLogin_Create(
+            user_id=user.id,
+            access_token=access,
+            refresh_token=refresh,
+            status=True
+        ))
     return {
         "access_token": access,
         "refresh_token": refresh,
@@ -83,7 +90,7 @@ def login(
 
 
 @router.get("/me", response_model=UserInfo)
-def read_users_me(db: Session = Depends(deps.get_db), current_user: UserInfo = Depends(deps.get_current_user)):
+def read_users_me(db: Session = Depends(deps.get_db), current_user: User_Info = Depends(deps.get_current_user)):
     """
     Fetch the current logged-in user.
     """
@@ -122,7 +129,7 @@ def create_user_signup(
 @router.patch("/add_credit", status_code=201, response_model=UserInfo_Update)
 async def add_credit(credit: condecimal(decimal_places=2),
                      db: Session = Depends(deps.get_db),
-                     current_user: UserInfo = Depends(deps.get_current_user)) -> User_Info:
+                     current_user: User_Info = Depends(deps.get_current_user)) -> User_Info:
     uinfo = UserInfo_Update(
         user_credit=current_user.user_credit + credit
     )
@@ -142,26 +149,16 @@ async def add_credit(credit: condecimal(decimal_places=2),
 
 
 @router.post('/logout')
-def logout(dependencies=Depends(OAuth2PasswordBearer), db: Session = Depends(deps.get_db)):
-    # token = dependencies
-    # payload = jwt.decode(token, JWT_SECRET, ALGORITHM)
-    # print(f"PAreload :::: {payload}")
-    # user_id = payload['sub']
-    # token_record = db.query(models.TokenTable).all()
-    # info = []
-    # for record in token_record:
-    #     print("record", record)
-    #     if (datetime.utcnow() - record.created_date).days > 1:
-    #         info.append(record.user_id)
-    # if info:
-    #     existing_token = db.query(models.TokenTable).where(TokenTable.user_id.in_(info)).delete()
-    #     db.commit()
-    #
-    # existing_token = db.query(models.TokenTable).filter(models.TokenTable.user_id == user_id,
-    #                                                     models.TokenTable.access_toke == token).first()
-    # if existing_token:
-    #     existing_token.status = False
-    #     db.add(existing_token)
-    #     db.commit()
-    #     db.refresh(existing_token)
+def logout(token_tuple=Depends(deps.get_current_user_tuple), db: Session = Depends(deps.get_db)):
+    print(f"Payload :::: {token_tuple[1]}")
+    # commit to user login token table, Check if a token already exists, if exists update otherwise create new
+    ulog = get_user_login_service.get_by_user_id(db_session=db, user_id=token_tuple[0].id)
+    if ulog is not None:
+        token_db = get_user_login_service.update(db_session=db, _id=ulog.access_token, obj=UserLogin_Update(
+            access_token=ulog.access_token,
+            refresh_token=ulog.refresh_token,
+            status=False
+        ))
+    else:
+        return {"message": f"Logging out Unknown {token_tuple[0].user_name}"}
     return {"message": "Logout Successfully"}
