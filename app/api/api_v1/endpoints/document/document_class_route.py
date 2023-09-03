@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api import deps
@@ -12,7 +12,7 @@ from app.schemas.document.document_class import DocumentClass, DocumentClass_Cre
 router = APIRouter(prefix="/doc-class", tags=["Document Class"])
 
 
-@router.post("/create_doc_class", status_code=201, response_model=DocumentClass)
+@router.post("/create_doc_class", status_code=status.HTTP_201_CREATED, response_model=DocumentClass)
 async def create_doc_class(dc: DocumentClass_Create,
                            db: Session = Depends(deps.get_db),
                            cur_user: User_Info = Depends(deps.get_current_user)) -> Document_Class:
@@ -43,7 +43,7 @@ async def create_doc_class(dc: DocumentClass_Create,
     return get_document_class_service.create(db_session=db, obj_in=dc)
 
 
-@router.get("/", status_code=201, response_model=List[DocumentClass])
+@router.get("/", status_code=status.HTTP_200_OK, response_model=List[DocumentClass])
 async def list_doc_class(db: Session = Depends(deps.get_db),
                          cur_user: User_Info = Depends(deps.get_current_user)) -> List[Document_Class]:
     """
