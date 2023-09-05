@@ -1,12 +1,17 @@
 import os
+from io import BytesIO
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
+from pydantic import condecimal
 from sqlalchemy.orm import Session
 from app.core.airlogger import logger
 from app.api import deps
 from app.core import utils
 from app.core.config import settings
+
 from app.models.user.user_info import User_Info
+from app.schemas.user.user_info import UserInfo_Update
+
 from app.models.documents.document_user import Document_User, DocumentSrc, DocumentType, DocumentState, DocumentReview
 from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
     DocumentUser_Upload
@@ -17,6 +22,10 @@ from app.crud.document.document_user import get_document_user_service
 from app.crud.document.document_category import get_document_category_service
 from app.crud.document.document_class import get_document_class_service
 from app.crud.document.document_audit import get_document_audit_service
+from app.crud.user.user_info import get_user_info_service
+
+from app.core.file_logic import FileLogic
+from app.core.credit_business_logic import Credit_Logic
 
 router = APIRouter(prefix="/documents", tags=["Document"])
 
@@ -72,13 +81,34 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
             status_code=400, detail="Document with same hash exists"
         )
 
+    num_pages = -1
+
     try:
         content = await file.read()
         with open(_file_save_path + "/" + file_name_hash, 'wb') as f:
             f.write(content)
+
+        if _extension in ["pdf", "PDF", "Pdf"]:
+            num_pages = FileLogic.validate_file_online(filename=file_name_hash, filestream=BytesIO(content))
+            if num_pages < 1:
+                raise HTTPException(status_code=400, detail="Document pdf could not be read!")
+        else:
+            num_pages = 1
+    except HTTPException as ex:
+        raise HTTPException(status_code=400, detail=ex.detail)
     except Exception as ex:
         raise HTTPException(
             status_code=400, detail="File writing error"
+        )
+
+    # execute credit logic
+    new_credit_balance = Credit_Logic.debit(num_pages_scanned=num_pages,
+                                            num_pages_not_scanned=0,
+                                            current_credits=float(cur_user.user_credit))
+
+    if new_credit_balance < 1:
+        raise HTTPException(
+            status_code=400, detail="Not enough credits!"
         )
 
     dc = DocumentUser_Create(
@@ -93,6 +123,7 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         document_category_code=existing_category_code.id,
         document_state=du.document_state,
         document_review=du.document_review,
+        document_pages=num_pages,
         document_is_deleted=du.document_is_deleted
     )
     # assign data from file
@@ -106,6 +137,10 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         action_msg=f"Document <{dc.document_filename} created by user {cur_user.user_name}> ."
     )
     doc_audit = get_document_audit_service.create(db, audit_log)
+
+    # update user credits
+    uc = UserInfo_Update(user_credit=condecimal(decimal_places=2).from_float(new_credit_balance))
+    user_info_serv = get_user_info_service.update(db, _id=cur_user.id, obj=uc)
 
     return result_obj
 
@@ -138,12 +173,3 @@ async def delete_document(document_id: str,
         logger.info(f"Failed to delete the file {_file_save_path}")
 
     return get_document_user_service.update(db_session=db, _id=existing_filehash.id, obj=du)
-
-# @router.patch("/delete", status_code=201, response_model=DocumentUser)
-# async def delete_document(du: DocumentUser_Update,
-#                           db: Session = Depends(deps.get_db),
-#                           cur_user: User_Info = Depends(deps.get_current_user)
-#                           ) -> Document_User:
-#
-#
-#     return get_document_user_service.list_by_user_id(db_session=db, user_id=cur_user.id)
