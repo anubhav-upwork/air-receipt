@@ -46,6 +46,7 @@ class DocumentUser_Create(DocumentUser_Base):
     document_category_code: int = 1
     document_state: DocumentState = DocumentState.created
     document_review: DocumentReview = DocumentReview.not_required
+    document_pages: Optional[int] = None
     document_is_deleted: bool = False
 
     class Config:
