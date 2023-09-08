@@ -1,31 +1,28 @@
 import os
 from io import BytesIO
 from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
 from pydantic import condecimal
 from sqlalchemy.orm import Session
-from app.core.airlogger import logger
+
 from app.api import deps
 from app.core import utils
+from app.core.airlogger import logger
 from app.core.config import settings
-
-from app.models.user.user_info import User_Info
-from app.schemas.user.user_info import UserInfo_Update
-
-from app.models.documents.document_user import Document_User, DocumentSrc, DocumentType, DocumentState, DocumentReview
-from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
-    DocumentUser_Upload
-from app.models.documents.document_action_audit import Document_Audit_Trail
-from app.schemas.document.document_audit_trail import DocumentAudit_Create
-
-from app.crud.document.document_user import get_document_user_service
+from app.core.credit_business_logic import Credit_Logic
+from app.core.file_logic import FileLogic
+from app.crud.document.document_audit import get_document_audit_service
 from app.crud.document.document_category import get_document_category_service
 from app.crud.document.document_class import get_document_class_service
-from app.crud.document.document_audit import get_document_audit_service
+from app.crud.document.document_user import get_document_user_service
 from app.crud.user.user_info import get_user_info_service
-
-from app.core.file_logic import FileLogic
-from app.core.credit_business_logic import Credit_Logic
+from app.models.documents.document_user import Document_User, DocumentState
+from app.models.user.user_info import User_Info
+from app.schemas.document.document_audit_trail import DocumentAudit_Create
+from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
+    DocumentUser_Upload
+from app.schemas.user.user_info import UserInfo_Update
 
 router = APIRouter(prefix="/documents", tags=["Document"])
 
@@ -82,18 +79,29 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         )
 
     num_pages = -1
+    file_size = 0
 
     try:
         content = await file.read()
+
+        # get File size
+        file_size = len(content) / 1000  # kilobytes
+        logger.info(f"Size {file_size}")
+
+        if file_size > settings.MAX_FILE_SIZE_KB:
+            raise HTTPException(status_code=400,
+                                detail=f"Uploaded document exceeds File Size Limit {settings.MAX_FILE_SIZE_KB} Kb!")
+
         with open(_file_save_path + "/" + file_name_hash, 'wb') as f:
             f.write(content)
 
         if _extension in ["pdf", "PDF", "Pdf"]:
-            num_pages = FileLogic.validate_file_online(filename=file_name_hash, filestream=BytesIO(content))
+            num_pages = FileLogic.validate_pdf_file_online(filename=file_name_hash, filestream=BytesIO(content))
             if num_pages < 1:
                 raise HTTPException(status_code=400, detail="Document pdf could not be read!")
         else:
             num_pages = 1
+
     except HTTPException as ex:
         raise HTTPException(status_code=400, detail=ex.detail)
     except Exception as ex:

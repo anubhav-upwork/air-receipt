@@ -5,7 +5,7 @@ from io import BytesIO
 
 class FileLogic:
     @staticmethod
-    def validate_file_offline(filename: str, savepath: str) -> int:
+    def validate_pdf_file_offline(filename: str, savepath: str) -> int:
         number_of_pages = -1
         try:
             reader = PdfReader(savepath + "/" + filename)
@@ -17,7 +17,7 @@ class FileLogic:
         return number_of_pages
 
     @staticmethod
-    def validate_file_online(filename: str, filestream: BytesIO) -> int:
+    def validate_pdf_file_online(filename: str, filestream: BytesIO) -> int:
         try:
             _pdf = PdfReader(filestream)
             number_of_pages = len(_pdf.pages)

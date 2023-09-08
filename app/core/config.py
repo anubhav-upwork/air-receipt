@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     UPLOAD_PATH: pathlib.Path = pathlib.Path.joinpath(ROOT, "public/documents")
     ALLOWED_CONTENT: List = ['image/jpeg', 'image/png', 'image/bmp', 'image/tiff', 'application/pdf']
+    MAX_FILE_SIZE_KB: int = 5 * 1024
 
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10  # 10 minutes
