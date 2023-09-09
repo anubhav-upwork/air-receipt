@@ -31,12 +31,6 @@ def create_tables():
 
 
 def create_app() -> FastAPI:
-    # app_id = f"air_front_{random.randint(0, 10000)}"
-    # logger.info(f"Uvicorn App ID : {app_id}")
-    # loop = asyncio.get_event_loop()
-    # aioproducer = AIOKafkaProducer(loop=loop,
-    #                                client_id=app_id,
-    #                                bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS)
 
     app = FastAPI(
         title="Air Receipt",

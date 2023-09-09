@@ -20,6 +20,7 @@ async def create_producer() -> AIOKafkaProducer:
     :return: AIOKafkaProducer instance connected to bootstrap_server.
     """
     app_id = f"air_front_{random.randint(0, 10000)}"
+    logger.info(f"Uvicorn App ID : {app_id}")
 
     try:
         producer = AIOKafkaProducer(
