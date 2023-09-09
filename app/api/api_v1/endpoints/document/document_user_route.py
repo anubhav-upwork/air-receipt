@@ -24,6 +24,11 @@ from app.schemas.document.document_user import DocumentUser, DocumentUser_Create
     DocumentUser_Upload
 from app.schemas.user.user_info import UserInfo_Update
 
+# Kafka Producer
+from aiokafka.errors import KafkaError, NodeNotReadyError, KafkaConnectionError
+from app.schemas.document.kafka_document_schema import Kafka_Document
+from app.core.kafka_producer import producers, send_kafka_message, create_producer
+
 router = APIRouter(prefix="/documents", tags=["Document"])
 
 
@@ -150,6 +155,32 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
     uc = UserInfo_Update(user_credit=condecimal(decimal_places=2).from_float(new_credit_balance))
     user_info_serv = get_user_info_service.update(db, _id=cur_user.id, obj=uc)
 
+    # send over kafka producer
+    kafDoc = Kafka_Document(
+        user_id=cur_user.id,
+        document_id=file_name_hash,
+        document_filename=_filename,
+        document_pages=num_pages,
+        document_size=file_size
+    )
+
+    try:
+        parser_producer = producers[settings.Kafka.KAFKA_TOPIC] or await create_producer()
+        if parser_producer:
+            await send_kafka_message(parser_producer, kafDoc)
+    except NodeNotReadyError as ke:
+        logger.error(f"Error: Kafka producer connection error: ({ke})")
+        raise HTTPException(
+            status_code=400, detail="Could not transmit document to backend, Communication Error!"
+        )
+
+    except KafkaConnectionError as ke:
+        logger.error(f"Error: Kafka producer connection error: ({ke})")
+
+    except KafkaError as ke:
+        raise HTTPException(
+                status_code=400, detail="Could not transmit document to backend, Communication Error!"
+            )
     return result_obj
 
 

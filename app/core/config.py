@@ -37,6 +37,12 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER: EmailStr = "admin@recipeapi.com"
     FIRST_SUPERUSER_PW: str = "anubhav.rohatgi"
 
+    # Kafka variables
+    class Kafka:
+        KAFKA_TOPIC: str = 'docu_push_todo'
+        KAFKA_BOOTSTRAP_SERVERS: str = 'localhost:9092'
+
+
     class Config:
         case_sensitive = True
 
