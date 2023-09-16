@@ -17,9 +17,9 @@ class FileLogic:
         return number_of_pages
 
     @staticmethod
-    def validate_pdf_file_online(filename: str, filestream: BytesIO) -> int:
+    def validate_pdf_file_online(filename: str, filestream: BytesIO, file_pass: str = None) -> int:
         try:
-            _pdf = PdfReader(filestream)
+            _pdf = PdfReader(filestream, password=file_pass)
             number_of_pages = len(_pdf.pages)
         except Exception as ex:
             logger.error(f"File Could not be opened {filename}")

@@ -74,9 +74,17 @@ async def send_kafka_message(
         raise HTTPException(
             status_code=400, detail="Could not transmit document to backend, Communication Error!"
         )
-
     except KafkaConnectionError as ke:
         logger.error(f"Error: Kafka producer connection error: ({ke})")
+        raise HTTPException(
+            status_code=400, detail="Could not transmit document to backend, Communication Error!"
+        )
 
     except KafkaError as error:
         logger.error(f"Error: Kafka send message error: ({error})")
+        raise HTTPException(
+            status_code=400, detail=f"Could not transmit document due to {error}!"
+        )
+
+
+

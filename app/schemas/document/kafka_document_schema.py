@@ -8,8 +8,10 @@ class Kafka_Document(BaseModel):
     user_id: int
     document_id: str
     document_filename: str
+    document_password: Optional[str] = None
     document_pages: int
     document_size: float = 0.0
+    document_extension: str
     document_push_time: str = datetime.now().strftime("%m/%d/%Y, %H:%M:%S")
 
     class Config:

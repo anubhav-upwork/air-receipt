@@ -97,11 +97,10 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
             raise HTTPException(status_code=400,
                                 detail=f"Uploaded document exceeds File Size Limit {settings.MAX_FILE_SIZE_KB} Kb!")
 
-        with open(_file_save_path + "/" + file_name_hash, 'wb') as f:
-            f.write(content)
-
         if _extension in ["pdf", "PDF", "Pdf"]:
-            num_pages = FileLogic.validate_pdf_file_online(filename=file_name_hash, filestream=BytesIO(content))
+            num_pages = FileLogic.validate_pdf_file_online(filename=file_name_hash,
+                                                           filestream=BytesIO(content),
+                                                           file_pass=du.document_password)
             if num_pages < 1:
                 raise HTTPException(status_code=400, detail="Document pdf could not be read!")
         else:
@@ -123,6 +122,10 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         raise HTTPException(
             status_code=400, detail="Not enough credits!"
         )
+    else:
+        # write file to disk
+        with open(_file_save_path + "/" + file_name_hash, 'wb') as f:
+            f.write(content)
 
     dc = DocumentUser_Create(
         user_id=cur_user.id,
@@ -160,8 +163,10 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         user_id=cur_user.id,
         document_id=file_name_hash,
         document_filename=_filename,
+        document_password=du.document_password,
         document_pages=num_pages,
-        document_size=file_size
+        document_size=file_size,
+        document_extension=_extension
     )
 
     try:
@@ -179,8 +184,8 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
 
     except KafkaError as ke:
         raise HTTPException(
-                status_code=400, detail="Could not transmit document to backend, Communication Error!"
-            )
+            status_code=400, detail="Could not transmit document to backend, Communication Error!"
+        )
     return result_obj
 
 
