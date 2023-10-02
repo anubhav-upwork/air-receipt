@@ -35,6 +35,7 @@ class DocumentUserService(BaseService[Document_User, DocumentUser_Create, Docume
             document_location=obj_in.document_location,
             document_password=obj_in.document_password,
             document_category_code=obj_in.document_category_code,
+            document_pages=obj_in.document_pages,
             document_state=obj_in.document_state,
             document_review=obj_in.document_review,
             document_is_deleted=False

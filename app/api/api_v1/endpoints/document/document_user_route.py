@@ -1,23 +1,38 @@
 import os
+from io import BytesIO
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, Form
+
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
+from pydantic import condecimal
 from sqlalchemy.orm import Session
-from app.core.airlogger import logger
+
 from app.api import deps
 from app.core import utils
+from app.core.airlogger import logger
 from app.core.config import settings
-from app.models.user.user_info import User_Info
-from app.models.documents.document_user import Document_User, DocumentSrc, DocumentType, DocumentState, DocumentReview
-from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
-    DocumentUser_Upload
-from app.crud.document.document_user import get_document_user_service
+from app.core.credit_business_logic import Credit_Logic
+from app.core.file_logic import FileLogic
+from app.crud.document.document_audit import get_document_audit_service
 from app.crud.document.document_category import get_document_category_service
 from app.crud.document.document_class import get_document_class_service
+from app.crud.document.document_user import get_document_user_service
+from app.crud.user.user_info import get_user_info_service
+from app.models.documents.document_user import Document_User, DocumentState
+from app.models.user.user_info import User_Info
+from app.schemas.document.document_audit_trail import DocumentAudit_Create
+from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
+    DocumentUser_Upload
+from app.schemas.user.user_info import UserInfo_Update
+
+# Kafka Producer
+from aiokafka.errors import KafkaError, NodeNotReadyError, KafkaConnectionError
+from app.schemas.document.kafka_document_schema import Kafka_Document
+from app.core.kafka_producer import producers, send_kafka_message, create_producer
 
 router = APIRouter(prefix="/documents", tags=["Document"])
 
 
-@router.post("/upload_document", status_code=201, response_model=DocumentUser)
+@router.post("/upload_document", status_code=status.HTTP_201_CREATED, response_model=DocumentUser)
 async def upload_document(du: DocumentUser_Upload = Depends(),
                           file: UploadFile = File(...),
                           db: Session = Depends(deps.get_db),
@@ -68,14 +83,49 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
             status_code=400, detail="Document with same hash exists"
         )
 
+    num_pages = -1
+    file_size = 0
+
     try:
         content = await file.read()
-        with open(_file_save_path + "/" + file_name_hash, 'wb') as f:
-            f.write(content)
+
+        # get File size
+        file_size = len(content) / 1000  # kilobytes
+        logger.info(f"Size {file_size}")
+
+        if file_size > settings.MAX_FILE_SIZE_KB:
+            raise HTTPException(status_code=400,
+                                detail=f"Uploaded document exceeds File Size Limit {settings.MAX_FILE_SIZE_KB} Kb!")
+
+        if _extension in ["pdf", "PDF", "Pdf"]:
+            num_pages = FileLogic.validate_pdf_file_online(filename=file_name_hash,
+                                                           filestream=BytesIO(content),
+                                                           file_pass=du.document_password)
+            if num_pages < 1:
+                raise HTTPException(status_code=400, detail="Document pdf could not be read!")
+        else:
+            num_pages = 1
+
+    except HTTPException as ex:
+        raise HTTPException(status_code=400, detail=ex.detail)
     except Exception as ex:
         raise HTTPException(
             status_code=400, detail="File writing error"
         )
+
+    # execute credit logic
+    new_credit_balance = Credit_Logic.debit(num_pages_scanned=num_pages,
+                                            num_pages_not_scanned=0,
+                                            current_credits=float(cur_user.user_credit))
+
+    if new_credit_balance < 1:
+        raise HTTPException(
+            status_code=400, detail="Not enough credits!"
+        )
+    else:
+        # write file to disk
+        with open(_file_save_path + "/" + file_name_hash, 'wb') as f:
+            f.write(content)
 
     dc = DocumentUser_Create(
         user_id=cur_user.id,
@@ -89,20 +139,64 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         document_category_code=existing_category_code.id,
         document_state=du.document_state,
         document_review=du.document_review,
+        document_pages=num_pages,
         document_is_deleted=du.document_is_deleted
     )
     # assign data from file
-    return get_document_user_service.create(db_session=db, obj_in=dc)
+    result_obj = get_document_user_service.create(db_session=db, obj_in=dc)
+
+    # Audit the document
+    # enter into user audit trail
+    audit_log = DocumentAudit_Create(
+        document_id=file_name_hash,
+        action=DocumentState.created,
+        action_msg=f"Document <{dc.document_filename} created by user {cur_user.user_name}> ."
+    )
+    doc_audit = get_document_audit_service.create(db, audit_log)
+
+    # update user credits
+    uc = UserInfo_Update(user_credit=condecimal(decimal_places=2).from_float(new_credit_balance))
+    user_info_serv = get_user_info_service.update(db, _id=cur_user.id, obj=uc)
+
+    # send over kafka producer
+    kafDoc = Kafka_Document(
+        user_id=cur_user.id,
+        document_id=file_name_hash,
+        document_filename=_filename,
+        document_password=du.document_password,
+        document_pages=num_pages,
+        document_size=file_size,
+        document_extension=_extension
+    )
+
+    try:
+        parser_producer = producers[settings.Kafka.KAFKA_TOPIC] or await create_producer()
+        if parser_producer:
+            await send_kafka_message(parser_producer, kafDoc)
+    except NodeNotReadyError as ke:
+        logger.error(f"Error: Kafka producer connection error: ({ke})")
+        raise HTTPException(
+            status_code=400, detail="Could not transmit document to backend, Communication Error!"
+        )
+
+    except KafkaConnectionError as ke:
+        logger.error(f"Error: Kafka producer connection error: ({ke})")
+
+    except KafkaError as ke:
+        raise HTTPException(
+            status_code=400, detail="Could not transmit document to backend, Communication Error!"
+        )
+    return result_obj
 
 
-@router.get("/document", status_code=201, response_model=List[DocumentUser])
+@router.get("/document", status_code=status.HTTP_200_OK, response_model=List[DocumentUser])
 async def list_user_documents(db: Session = Depends(deps.get_db),
                               cur_user: User_Info = Depends(deps.get_current_user)
                               ) -> List[Document_User]:
     return get_document_user_service.list_by_user_id(db_session=db, user_id=cur_user.id)
 
 
-@router.patch("/delete", status_code=201, response_model=DocumentUser)
+@router.patch("/delete", status_code=status.HTTP_201_CREATED, response_model=DocumentUser)
 async def delete_document(document_id: str,
                           db: Session = Depends(deps.get_db),
                           cur_user: User_Info = Depends(deps.get_current_user)
@@ -112,14 +206,14 @@ async def delete_document(document_id: str,
         raise HTTPException(
             status_code=400, detail=f"Document with filename {document_id} does not exist!"
         )
+    du = DocumentUser_Update(
+        document_is_deleted=True
+    )
+    _file_save_path = str(settings.UPLOAD_PATH) + "/" + str(cur_user.id) + "/" + document_id
+
+    if os.path.exists(_file_save_path):
+        os.remove(_file_save_path)
+    else:
+        logger.info(f"Failed to delete the file {_file_save_path}")
 
     return get_document_user_service.update(db_session=db, _id=existing_filehash.id, obj=du)
-
-# @router.patch("/delete", status_code=201, response_model=DocumentUser)
-# async def delete_document(du: DocumentUser_Update,
-#                           db: Session = Depends(deps.get_db),
-#                           cur_user: User_Info = Depends(deps.get_current_user)
-#                           ) -> Document_User:
-#
-#
-#     return get_document_user_service.list_by_user_id(db_session=db, user_id=cur_user.id)

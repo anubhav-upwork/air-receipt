@@ -26,7 +26,7 @@ def get_db() -> Generator:
 
 
 async def get_current_user(
-    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+        db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
 ) -> User_Info:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -53,8 +53,36 @@ async def get_current_user(
     return user
 
 
+async def get_current_user_tuple(
+        db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+) -> tuple[User_Info, str]:
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(
+            token,
+            JWT_SECRET,
+            algorithms=[ALGORITHM],
+            options={"verify_aud": False},
+        )
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except JWTError:
+        raise credentials_exception
+
+    user = db.query(User_Info).filter(User_Info.user_email == token_data.username).first()
+    if user is None:
+        raise credentials_exception
+    return user, token
+
+
 def get_current_active_superuser(
-    current_user: User_Info = Depends(get_current_user),
+        current_user: User_Info = Depends(get_current_user),
 ) -> User_Info:
     if not get_user_info_service.is_superuser(current_user):
         raise HTTPException(

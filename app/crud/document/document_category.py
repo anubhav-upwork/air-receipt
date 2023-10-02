@@ -12,7 +12,7 @@ from starlette.exceptions import HTTPException
 class DocumentCategoryService(BaseService[Document_Category, DocumentCategory_Create, DocumentCategory_Update]):
 
     def get_by_doccategory(self, db_session: Session, doc_cat: str) -> Optional[Document_Category]:
-        return db_session.query(Document_Category).filter(Document_Category.category == str).first()
+        return db_session.query(Document_Category).filter(Document_Category.category == doc_cat).first()
 
     def get_by_doccatcode(self, db_session: Session, code: int) -> Optional[Document_Category]:
         return db_session.query(Document_Category).filter(Document_Category.category_code == code).first()
