@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     #     raise ValueError(v)
 
     # SQLALCHEMY_DATABASE_URI: str = "mysql://anubhav:anubhav123@localhost:3307/air"
-    SQLALCHEMY_DATABASE_URI = "mysql://anubhav:anubhav123@localhost:3307/new_schema"
+    SQLALCHEMY_DATABASE_URI: str = "mysql://anubhav:anubhav123@localhost:3307/new_schema"
     FIRST_SUPERUSER: EmailStr = "admin@recipeapi.com"
     FIRST_SUPERUSER_PW: str = "anubhav.rohatgi"
 
@@ -42,7 +42,6 @@ class Settings(BaseSettings):
     class Kafka:
         KAFKA_TOPIC: str = 'docu_push_todo'
         KAFKA_BOOTSTRAP_SERVERS: str = 'localhost:9092'
-
 
     class Config:
         case_sensitive = True
