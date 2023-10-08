@@ -20,7 +20,7 @@ async def create_doc_class(dc: DocumentClass_Create,
         API for creating Document Class. Document Classes can be either of these below:
             INVOICE	1000
             RECEIPT	1001
-            CREDIT_NOT	1002
+            CREDIT_NOTE	1002
             OTHER	1003
     @param cur_user: Input Current User (Dependency Injection)
     @param dc: Input Document Class Create Pydantic Object

@@ -37,12 +37,23 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
                           file: UploadFile = File(...),
                           db: Session = Depends(deps.get_db),
                           cur_user: User_Info = Depends(deps.get_current_user)) -> Document_User:
+    """
+        When logged in, the method allows the user to upload the document file.
+        The file formats supported are BMP, JPG, PNG, TIFF, PDF
+        If the upload is successful, then after entering details in the database the message
+         is passed to Document Parser Micro Service
+    @param du: Input Document Upload data structure
+    @param file: Input file the user uploads
+    @param db: Data Base session - Dependency injection
+    @param cur_user: Current User who is uploading the file
+    @return: IF upload successful returns Document User Object otherwise raises HTTP exception
+    """
     _file_save_path = str(settings.UPLOAD_PATH) + "/" + str(cur_user.id)
     logger.info(f"Document Received: from:{cur_user.id}, file:{file.filename},"
                 f" State:{du.document_state},"
                 f" ClassId:{du.document_class}")
 
-    # Check if file store path exists, if not create dir
+    # Check if a file store path exists, if not create dir
     if not os.path.isdir(_file_save_path):
         os.makedirs(_file_save_path)
 
@@ -193,6 +204,12 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
 async def list_user_documents(db: Session = Depends(deps.get_db),
                               cur_user: User_Info = Depends(deps.get_current_user)
                               ) -> List[Document_User]:
+    """
+        Lists all the documents uploaded by the user
+    @param db: Data Base session - Dependency injection
+    @param cur_user: Current User who is accessing the session
+    @return: Output list of Document User Objects - all files uploaded by the user
+    """
     return get_document_user_service.list_by_user_id(db_session=db, user_id=cur_user.id)
 
 
@@ -201,6 +218,15 @@ async def delete_document(document_id: str,
                           db: Session = Depends(deps.get_db),
                           cur_user: User_Info = Depends(deps.get_current_user)
                           ) -> Document_User:
+    """
+        The route allows the user to delete his/her files.
+        The method does not delete entries in DB but releases the file storage
+         space by deleting the file.
+    @param document_id: Input document idthe user wants to delete
+    @param db: Data Base session - Dependency injection
+    @param cur_user: Current User who is accessing the session
+    @return: If delete is successful then method returns the updated Document User object
+    """
     existing_filehash = get_document_user_service.get_by_doc_id(db_session=db, doc_id=document_id)
     if not existing_filehash:
         raise HTTPException(
