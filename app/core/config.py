@@ -33,7 +33,8 @@ class Settings(BaseSettings):
     #         return v
     #     raise ValueError(v)
 
-    SQLALCHEMY_DATABASE_URI: str = "mysql://anubhav:anubhav123@localhost:3307/air"
+    # SQLALCHEMY_DATABASE_URI: str = "mysql://anubhav:anubhav123@localhost:3307/air"
+    SQLALCHEMY_DATABASE_URI = "mysql://anubhav:anubhav123@localhost:3307/new_schema"
     FIRST_SUPERUSER: EmailStr = "admin@recipeapi.com"
     FIRST_SUPERUSER_PW: str = "anubhav.rohatgi"
 

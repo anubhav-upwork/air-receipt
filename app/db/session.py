@@ -1,10 +1,13 @@
-from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, scoped_session
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = "mysql://anubhav:anubhav123@localhost:3307/new_schema"
+from app.core.config import settings
+
+# SQLALCHEMY_DATABASE_URL = "mysql://anubhav:anubhav123@localhost:3307/new_schema"
+
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL,
+    settings.SQLALCHEMY_DATABASE_URI,
     pool_pre_ping=True,
     echo=False)
 

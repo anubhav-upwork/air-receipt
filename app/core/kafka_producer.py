@@ -16,7 +16,7 @@ producers = {}
 async def create_producer() -> AIOKafkaProducer:
     """Creates new AIOKafkaProducer instance connected to kafka server.
 
-    Will produce exactly one copy of message in kafka "parser" topic.
+    Will produce exactly one copy of a message in kafka "parser" topic.
     :return: AIOKafkaProducer instance connected to bootstrap_server.
     """
     app_id = f"air_front_{random.randint(0, 10000)}"

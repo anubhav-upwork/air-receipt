@@ -29,9 +29,9 @@ from app.db_data.document_category_data import DOCUMENT_CATEGORY_DATA
 
 
 def init_db(db: Session) -> bool:
-    # Tables should be created with Alembic migrations
+    # Tables should be created with Alembic migrations,
     # But if you don't want to use migrations, create
-    # the tables un-commenting the next line
+    # the tables uncommenting the next line
     Base.metadata.create_all(bind=engine)
 
     # populate user roles
