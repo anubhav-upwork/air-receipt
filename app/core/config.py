@@ -43,6 +43,9 @@ class Settings(BaseSettings):
         KAFKA_TOPIC: str = 'docu_push_todo'
         KAFKA_BOOTSTRAP_SERVERS: str = 'localhost:9092'
 
+    class streamlit_ui:
+        BACKEND_URL: str = "http://localhost:8000"
+
     class Config:
         case_sensitive = True
 
