@@ -46,7 +46,7 @@ def login(db: Session = Depends(deps.get_db), form_data: OAuth2PasswordRequestFo
         )
 
         user_audit = get_user_action_audit_service.create(db, audit_log)
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(status_code=401, detail="Incorrect username or password")
 
     # enter into user audit trail
     audit_log = UserAuditTrail_Create(
