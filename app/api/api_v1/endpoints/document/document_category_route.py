@@ -46,7 +46,7 @@ async def list_doc_category(db: Session = Depends(deps.get_db),
     """
     API to list Document Categories
     @param db: Input DB session
-    @param cur_user: Input current user session to restrict access
+    @param cur_user: Input current user session to restrict an access
     @return: Output list of Document Categories listed as list of pydantic objects
     """
     if not cur_user.user_is_superuser:

@@ -1,5 +1,7 @@
 # air-receipt
 
+* The application also requires kafka producer access so as to produce to todo topic
+
 
 Run
 uvicorn --reload main:app
