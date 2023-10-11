@@ -19,7 +19,7 @@ python-multipart
 PyYAML==6.0.1
 SQLAlchemy~=1.4.22
 SQLAlchemy-Utils==0.41.1
-tenacity==8.0.1
+tenacity~=8.2.3
 uvicorn==0.23.2
 Werkzeug==2.3.6
 starlette~=0.27.0
@@ -30,3 +30,5 @@ pypdf~=3.15.5
 aiokafka~=0.8.1
 alembic~=1.6.5
 pytest~=7.4.2
+streamlit~=1.27.2
+requests~=2.31.0
