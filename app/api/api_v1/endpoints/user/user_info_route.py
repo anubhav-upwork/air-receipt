@@ -36,3 +36,14 @@ async def update_user(email: EmailStr, uinfo: UserInfo_Update,
             status_code=400, detail="User does not exist"
         )
     return get_user_info_service.update(db_session=db, _id=existing_user_email.id, obj=uinfo)
+
+
+@router.get("/check_user_exists", status_code=status.HTTP_200_OK, response_model=UserInfo)
+async def check_user_exists(email: EmailStr,
+                            db: Session = Depends(deps.get_db)) -> User_Info:
+    existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
+    if not existing_user_email:
+        raise HTTPException(
+            status_code=404, detail="User does not exist"
+        )
+    return existing_user_email
