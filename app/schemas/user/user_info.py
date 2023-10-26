@@ -70,6 +70,7 @@ class UserInfoShare(UserInfo_Base):
     user_mobile: str
     user_role: int
     user_type: int
+    user_credit: condecimal(decimal_places=2)
 
     class Config:
         from_attributes = True
