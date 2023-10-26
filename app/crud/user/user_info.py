@@ -16,6 +16,9 @@ class UserInfoService(BaseService[User_Info, UserInfo_Create, UserInfo_Update]):
     def get_by_email(self, db_session: Session, uemail: str) -> Optional[User_Info]:
         return db_session.query(User_Info).filter(User_Info.user_email == uemail).first()
 
+    def get_by_usr(self, db_session: Session, usr: str) -> Optional[User_Info]:
+        return db_session.query(User_Info).filter(User_Info.user_name == usr).first()
+
     def get_by_mobile(self, db_session: Session, umobile: str) -> Optional[User_Info]:
         return db_session.query(User_Info).filter(User_Info.user_mobile == umobile).first()
 

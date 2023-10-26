@@ -5,7 +5,6 @@ from app.schemas.schema_utils import to_camel
 
 
 class UserInfo_Base(BaseModel):
-
     class Config:
         alias_generator = to_camel
         populate_by_name = True
@@ -58,6 +57,19 @@ class UserInfoSuper_Create(UserInfo_Base):
     user_is_deleted: bool
     user_is_active: bool = True
     user_is_superuser: bool = False
+
+    class Config:
+        from_attributes = True
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class UserInfoShare(UserInfo_Base):
+    user_name: str
+    user_email: str
+    user_mobile: str
+    user_role: int
+    user_type: int
 
     class Config:
         from_attributes = True
