@@ -11,7 +11,7 @@ class FileLogic:
             reader = PdfReader(savepath + "/" + filename)
             number_of_pages = len(reader.pages)
         except Exception as ex:
-            logger.error(f"File Could not be opened {filename}")
+            logger.error(f"File Could not be opened {filename} error {ex}")
             number_of_pages = -1
         logger.info(f"PDF File uploaded contains {number_of_pages} pages")
         return number_of_pages
@@ -19,10 +19,13 @@ class FileLogic:
     @staticmethod
     def validate_pdf_file_online(filename: str, filestream: BytesIO, file_pass: str = None) -> int:
         try:
-            _pdf = PdfReader(filestream, password=file_pass)
+            if len(file_pass) > 3:
+                _pdf = PdfReader(filestream, password=file_pass)
+            else:
+                _pdf = PdfReader(filestream)
             number_of_pages = len(_pdf.pages)
         except Exception as ex:
-            logger.error(f"File Could not be opened {filename}")
+            logger.error(f"File Could not be opened {filename} error {ex}")
             number_of_pages = -1
         logger.info(f"PDF File uploaded contains {number_of_pages} pages")
         return number_of_pages
