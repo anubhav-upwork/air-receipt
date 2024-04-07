@@ -1,6 +1,6 @@
 fastapi==0.101.0
 fastapi-csrf-protect
-cryptography==3.4.7
+# cryptography==3.4.7
 config-parser==0.0.1
 mysql-connector==2.2.9
 mysql-connector-python==8.1.0
@@ -26,9 +26,11 @@ starlette~=0.27.0
 passlib~=1.7.4
 python-magic~=0.4.27
 rich~=13.5.2
-pypdf~=3.15.5
+# pypdf~=3.15.5
 aiokafka~=0.8.1
 alembic~=1.6.5
 pytest~=7.4.2
 streamlit~=1.27.2
 requests~=2.31.0
+pathlib~=1.0.1
+pypdf~=3.17.0
