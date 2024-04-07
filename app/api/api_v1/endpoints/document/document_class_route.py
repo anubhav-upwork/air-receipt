@@ -44,18 +44,10 @@ async def create_doc_class(dc: DocumentClass_Create,
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[DocumentClass])
-async def list_doc_class(db: Session = Depends(deps.get_db),
-                         cur_user: User_Info = Depends(deps.get_current_user)) -> List[Document_Class]:
+async def list_doc_class(db: Session = Depends(deps.get_db)) -> List[Document_Class]:
     """
     API for listing all the stored Document Classes
-    @param cur_user: Input Current User (Dependency Injection)
     @param db: Input DB session
     @return: Outputs List Document Class Pydantic
     """
-
-    if not cur_user.user_is_superuser:
-        raise HTTPException(
-            status_code=401, detail="Not authorized to access this"
-        )
-
     return get_document_class_service.list(db_session=db)

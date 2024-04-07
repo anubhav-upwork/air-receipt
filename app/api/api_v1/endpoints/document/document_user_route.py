@@ -2,7 +2,7 @@ import os
 from io import BytesIO
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile, status, Query
 from pydantic import condecimal
 from sqlalchemy.orm import Session
 
@@ -21,7 +21,7 @@ from app.models.documents.document_user import Document_User, DocumentState
 from app.models.user.user_info import User_Info
 from app.schemas.document.document_audit_trail import DocumentAudit_Create
 from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
-    DocumentUser_Upload
+    DocumentUser_Upload, DocumentUser_Show
 from app.schemas.user.user_info import UserInfo_Update
 
 # Kafka Producer
@@ -243,3 +243,34 @@ async def delete_document(document_id: str,
         logger.info(f"Failed to delete the file {_file_save_path}")
 
     return get_document_user_service.update(db_session=db, _id=existing_filehash.id, obj=du)
+
+
+@router.get("/document_page/", status_code=status.HTTP_200_OK, response_model=List[DocumentUser])
+async def list_user_documents_paginate(page: int = Query(1, alias="page"),
+                                       page_size: int = Query(10, alias="pageSize"),
+                                       db: Session = Depends(deps.get_db),
+                                       cur_user: User_Info = Depends(deps.get_current_user)
+                                       ) -> List[Document_User]:
+    """
+        Lists all the documents uploaded by the user
+    @param page_size:
+    @param page:
+    @param db: Data Base session - Dependency injection
+    @param cur_user: Current User who is accessing the session
+    @return: Output list of Document User Objects - all files uploaded by the user
+    """
+    return get_document_user_service.list_by_user_id_paginated(db_session=db, user_id=cur_user.id,
+                                                               skip=page, limit=page_size)
+
+
+@router.get("/show_user_documents", status_code=status.HTTP_200_OK, response_model=List[DocumentUser_Show])
+async def show_user_documents(db: Session = Depends(deps.get_db),
+                              cur_user: User_Info = Depends(deps.get_current_user)
+                              ) -> List[DocumentUser_Show]:
+    """
+        Lists all the documents uploaded by the user
+    @param db: Data Base session - Dependency injection
+    @param cur_user: Current User who is accessing the session
+    @return: Output list of Document User Objects - all files uploaded by the user
+    """
+    return get_document_user_service.list_by_user_id_done(db_session=db, user_id=cur_user.id)

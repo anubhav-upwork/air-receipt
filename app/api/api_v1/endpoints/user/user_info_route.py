@@ -11,32 +11,45 @@ from app.core.security import hash_password
 router = APIRouter(prefix="/user", tags=["User"])
 
 
-@router.post("/create_user", status_code=status.HTTP_201_CREATED, response_model=UserInfo)
-async def create_user(uinfo: UserInfo_Create,
-                      db: Session = Depends(deps.get_db)) -> User_Info:
-    existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=uinfo.user_email)
-    existing_user_mobile = get_user_info_service.get_by_mobile(db_session=db, umobile=uinfo.user_mobile)
-    if existing_user_email or existing_user_mobile:
-        raise HTTPException(
-            status_code=409, detail="User already exists"
-        )
-    return get_user_info_service.create(db_session=db, obj_in=uinfo)
+# @router.post("/create_user", status_code=status.HTTP_201_CREATED, response_model=UserInfo)
+# async def create_user(uinfo: UserInfo_Create,
+#                       db: Session = Depends(deps.get_db)) -> User_Info:
+#     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=uinfo.user_email)
+#     existing_user_mobile = get_user_info_service.get_by_mobile(db_session=db, umobile=uinfo.user_mobile)
+#     if existing_user_email or existing_user_mobile:
+#         raise HTTPException(
+#             status_code=409, detail="User already exists"
+#         )
+#     return get_user_info_service.create(db_session=db, obj_in=uinfo)
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[UserInfo])
-async def list_users(db: Session = Depends(deps.get_db)) -> List[User_Info]:
+async def list_users(db: Session = Depends(deps.get_db),
+                     cur_user: User_Info = Depends(deps.get_current_user)) -> List[User_Info]:
+    if not cur_user.user_is_superuser:
+        raise HTTPException(status_code=404,
+                            detail="Not authorized to access this, Only SuperUser can access")
     return get_user_info_service.list(db_session=db)
 
 
 @router.patch("/update_user", status_code=status.HTTP_201_CREATED, response_model=UserInfo_Update)
 async def update_user(email: EmailStr, uinfo: UserInfo_Update,
-                      db: Session = Depends(deps.get_db)) -> User_Info:
+                      db: Session = Depends(deps.get_db),
+                      cur_user: User_Info = Depends(deps.get_current_user)) -> User_Info:
     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
     if not existing_user_email:
         raise HTTPException(
             status_code=404, detail=f"User {email}does not exist"
         )
-    return get_user_info_service.update(db_session=db, _id=existing_user_email.id, obj=uinfo)
+
+    if cur_user.user_email != email:
+        raise HTTPException(status_code=404,
+                            detail="Not authorized to access this, Only SuperUser can access")
+    elif not cur_user.user_is_superuser:
+        raise HTTPException(status_code=404,
+                            detail="Not authorized to access this")
+    else:
+        return get_user_info_service.update(db_session=db, _id=existing_user_email.id, obj=uinfo)
 
 
 @router.get("/check_email_exists/{email}", status_code=status.HTTP_200_OK, response_model=str)
@@ -76,14 +89,37 @@ async def check_user_exists(user_name: str,
 async def update_user_password(email: EmailStr,
                                phone: str,
                                password: str,
-                               db: Session = Depends(deps.get_db)) -> User_Info:
+                               db: Session = Depends(deps.get_db),
+                               cur_user: User_Info = Depends(deps.get_current_user)) -> User_Info:
+    if cur_user.user_email != email:
+        raise HTTPException(status_code=404,
+                            detail="Not authorized to access this, Only SuperUser can access")
+    elif not cur_user.user_is_superuser:
+        raise HTTPException(status_code=404,
+                            detail="Not authorized to access this, Only SuperUser can access")
+    else:
+        existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
+        if not existing_user_email or (existing_user_email.user_mobile != phone):
+            raise HTTPException(
+                status_code=404, detail=f"User {email} does not exist"
+            )
+
+        uinfo = UserInfo_Update(
+            user_password=hash_password(password)
+        )
+        return get_user_info_service.update(db_session=db, _id=existing_user_email.id, obj=uinfo)
+
+
+@router.patch("/forget_password", status_code=status.HTTP_201_CREATED)
+async def forget_password(email: EmailStr,
+                          uname: str,
+                          phone: str,
+                          db: Session = Depends(deps.get_db)):
     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
-    if not existing_user_email or (existing_user_email.user_mobile != phone):
+    if (not existing_user_email and
+            (existing_user_email.user_mobile != phone) and
+            (existing_user_email.user_name != uname)):
         raise HTTPException(
             status_code=404, detail=f"User {email} does not exist"
         )
-
-    uinfo = UserInfo_Update(
-        user_password=hash_password(password)
-    )
-    return get_user_info_service.update(db_session=db, _id=existing_user_email.id, obj=uinfo)
+    return {"response": "Your request to reset password is sent to your inbox"}

@@ -126,7 +126,7 @@ def create_user_signup(
     return user
 
 
-@router.patch("/add_credit", status_code=201, response_model=UserInfo_Update)
+@router.patch("/add_credit", status_code=200, response_model=UserInfo_Update)
 async def add_credit(credit: condecimal(decimal_places=2),
                      db: Session = Depends(deps.get_db),
                      current_user: User_Info = Depends(deps.get_current_user)) -> User_Info:
