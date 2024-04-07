@@ -7,7 +7,6 @@ from app.models.documents.document_user import DocumentSrc, DocumentType, Docume
 
 # Schema of User Type Base Class
 class DocumentUser_Base(BaseModel):
-
     class Config:
         alias_generator = to_camel
         populate_by_name = True
@@ -81,6 +80,16 @@ class DocumentUser_Delete(DocumentUser_Base):
         from_attributes = True
         alias_generator = to_camel
         populate_by_name = True
+
+
+class DocumentUser_Show(DocumentUser_Base):
+    id: int
+    user_id: int
+    document_id: str
+    document_pages: Optional[int]
+    document_state: DocumentState
+    created_at: datetime
+    # document_review: DocumentReview
 
 
 # Schema for User Type Retrieval

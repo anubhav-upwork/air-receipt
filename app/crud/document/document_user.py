@@ -18,11 +18,24 @@ class DocumentUserService(BaseService[Document_User, DocumentUser_Create, Docume
     def list_by_user_id(self, db_session: Session, user_id: int) -> Optional[List[Document_User]]:
         return db_session.query(Document_User).filter(Document_User.user_id == user_id).all()
 
+    def list_by_user_id_done(self, db_session: Session, user_id: int) -> Optional[List[Document_User]]:
+        return (db_session.query(Document_User).filter(Document_User.user_id == user_id)
+                .filter(Document_User.document_state == DocumentState.processed).all())
+
     def list_by_type(self, db_session: Session, doc_type: DocumentType) -> Optional[List[Document_User]]:
         return db_session.query(Document_User).filter(Document_User.document_type == doc_type).all()
 
     def list_by_source(self, db_session: Session, doc_src: DocumentSrc) -> Optional[List[Document_User]]:
         return db_session.query(Document_User).filter(Document_User.document_source == doc_src).all()
+
+    def list_by_user_id_paginated(self, db_session: Session, user_id: int, skip: int = 0, limit: int = 10) -> Optional[
+        List[Document_User]]:
+        return (db_session.query(Document_User).filter(Document_User.user_id == user_id)
+                .offset((skip-1)*limit).limit(limit).all())
+
+    def get_user_document_count(self, db_session: Session, user_id: int) -> int:
+        no_docs = db_session.query(Document_User).filter(Document_User.user_id == user_id).count()
+        return no_docs
 
     def create(self, db_session: Session, obj_in: DocumentUser_Create) -> Document_User:
         db_obj = Document_User(
