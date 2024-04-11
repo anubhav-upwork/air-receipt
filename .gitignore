@@ -6,3 +6,5 @@ app/models/user/__pycache__/
 /.vscode/
 .idea/
 app/public/
+*.log
+logs/
