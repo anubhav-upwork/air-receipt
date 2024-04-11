@@ -23,6 +23,7 @@ class DocumentState(str, enum.Enum):
     inprocess = "IN_PROCESS"
     processed = "PROCESSED"
     failed = "FAILED"
+    # viewed = "VIEWED"
 
 
 class DocumentReview(str, enum.Enum):
