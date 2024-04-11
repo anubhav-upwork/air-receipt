@@ -38,7 +38,7 @@ class DocumentHeaderInfo_Show(DocumentHeaderInfo_Base):
     seller_account_no: Optional[str] = None
     buyer_name: Optional[str] = None
     seller_tax_id: Optional[str] = None
-    buyer_tax_i: Optional[str] = None
+    buyer_tax_id: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -56,11 +56,38 @@ class DocumentSummaryInfo_Show(DocumentSummaryInfo_Base):
     total: Optional[str] = None
     gst_included: Optional[str] = None
     tax_amount: Optional[str] = None
-    transaction_i: Optional[str] = None
+    transaction_id: Optional[str] = None
 
     class Config:
         from_attributes = True
 
+
+class DocumentInfoNoLine_Base(BaseModel):
+    class Config:
+        alias_generator = to_camel
+        populate_by_name = True
+
+
+class DocumentInfoNoLine_Show(DocumentInfoNoLine_Base):
+    seller_name: Optional[str] = None
+    seller_address: Optional[str] = None
+    seller_phone: Optional[str] = None
+    seller_email: Optional[str] = None
+    invoice_date: Optional[str] = None
+    invoice_no: Optional[str] = None
+    seller_account_no: Optional[str] = None
+    buyer_name: Optional[str] = None
+    seller_tax_id: Optional[str] = None
+    buyer_tax_id: Optional[str] = None
+    sub_total_return: Optional[str] = None
+    sub_total: Optional[str] = None
+    total: Optional[str] = None
+    gst_included: Optional[str] = None
+    tax_amount: Optional[str] = None
+    transaction_id: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 # Schema of User Type Base Class
 class DocumentInfo_Base(BaseModel):
@@ -72,11 +99,10 @@ class DocumentInfo_Base(BaseModel):
 # Schema for Update of Document_User
 class DocumentInfo_Show(DocumentInfo_Base):
     document_id: Optional[str] = None
-    document_type: Optional[int]
+    # document_type: Optional[int]
     document_owner: Optional[str] = None
     document_submitted_by: Optional[str] = None
     document_currency: Optional[str] = None
-    document_process_time_sec: Optional[float] = None
     doc_header: Optional[DocumentHeaderInfo_Show] = None
     doc_items: Optional[List[DocumentItemInfo_Show]] = None
     doc_summary: Optional[DocumentSummaryInfo_Show] = None

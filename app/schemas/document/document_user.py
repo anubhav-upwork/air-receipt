@@ -93,6 +93,11 @@ class DocumentUser_Show(DocumentUser_Base):
     # document_review: DocumentReview
 
 
+class DocumentQuery_Input(DocumentUser_Base):
+    user_id: int
+    document_id: str
+
+
 # Schema for User Type Retrieval
 class DocumentUser(DocumentUser_Base):
     id: int

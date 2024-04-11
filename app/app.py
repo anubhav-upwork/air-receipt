@@ -91,6 +91,7 @@ def create_app() -> FastAPI:
     from app.api.api_v1.endpoints.document import document_class_route, document_category_route, document_user_route
     from app.api.api_v1.endpoints.user import user_auth
     from app.api.api_v1.endpoints.integrations import dummy_integration
+    from app.api.api_v1.endpoints.document import document_info_route
 
     # User Routes
     app.include_router(user_role_route.router)
@@ -105,5 +106,8 @@ def create_app() -> FastAPI:
 
     # 3rd Party Integrations
     app.include_router(dummy_integration.router)
+
+    # Show Document Routes
+    app.include_router(document_info_route.router)
 
     return app
