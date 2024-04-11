@@ -64,7 +64,7 @@ class DocumentUser_Upload(DocumentUser_Base):
     document_state: DocumentState = DocumentState.created
     document_review: DocumentReview = DocumentReview.not_required
     document_is_deleted: bool = False
-    document_description: Optional[str]
+    document_description: Optional[str] = None
 
     class Config:
         from_attributes = True
