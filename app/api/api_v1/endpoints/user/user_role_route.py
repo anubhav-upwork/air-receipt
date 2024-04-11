@@ -42,10 +42,9 @@ async def update_access_level(role: UserRole_Update,
 
 
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[UserRole])
-async def list_user_roles(db: Session = Depends(deps.get_db),
-                          cur_user: User_Info = Depends(deps.get_current_user)) -> List[User_Roles]:
-    if not cur_user.user_is_superuser:
-        return get_user_role_service.list(db_session=db).remove(UserRole(user_role="superadmin"))
+async def list_user_roles(db: Session = Depends(deps.get_db)) -> List[User_Roles]:
+    # if not cur_user.user_is_superuser:
+    #     return get_user_role_service.list(db_session=db).remove(UserRole(user_role="superadmin"))
     return get_user_role_service.list(db_session=db)
 
 

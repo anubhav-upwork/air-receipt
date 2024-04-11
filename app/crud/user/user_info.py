@@ -22,6 +22,9 @@ class UserInfoService(BaseService[User_Info, UserInfo_Create, UserInfo_Update]):
     def get_by_mobile(self, db_session: Session, umobile: str) -> Optional[User_Info]:
         return db_session.query(User_Info).filter(User_Info.user_mobile == umobile).first()
 
+    def get_by_uid(self, db_session: Session, uid: int) -> Optional[User_Info]:
+        return db_session.query(User_Info).filter(User_Info.id == uid).first()
+
     def get_credit(self, db_session: Session, uemail: str) -> float:
         return db_session.query(User_Info).filter(User_Info.user_email == uemail).first().user_credit
 
