@@ -2,6 +2,7 @@ from typing import List
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException, status
+from app.core.http_exceptions import UnauthorizedException
 from app.models.user.user_info import User_Info
 from app.schemas.user.user_info import UserInfo, UserInfo_Create, UserInfo_Update, UserInfoShare
 from app.crud.user.user_info import get_user_info_service
@@ -11,24 +12,11 @@ from app.core.security import hash_password
 router = APIRouter(prefix="/user", tags=["User"])
 
 
-# @router.post("/create_user", status_code=status.HTTP_201_CREATED, response_model=UserInfo)
-# async def create_user(uinfo: UserInfo_Create,
-#                       db: Session = Depends(deps.get_db)) -> User_Info:
-#     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=uinfo.user_email)
-#     existing_user_mobile = get_user_info_service.get_by_mobile(db_session=db, umobile=uinfo.user_mobile)
-#     if existing_user_email or existing_user_mobile:
-#         raise HTTPException(
-#             status_code=409, detail="User already exists"
-#         )
-#     return get_user_info_service.create(db_session=db, obj_in=uinfo)
-
-
 @router.get("/", status_code=status.HTTP_200_OK, response_model=List[UserInfo])
 async def list_users(db: Session = Depends(deps.get_db),
                      cur_user: User_Info = Depends(deps.get_current_user)) -> List[User_Info]:
     if not cur_user.user_is_superuser:
-        raise HTTPException(status_code=404,
-                            detail="Not authorized to access this, Only SuperUser can access")
+        raise UnauthorizedException("Not authorized to access this, Only SuperUser can access")
     return get_user_info_service.list(db_session=db)
 
 
@@ -39,15 +27,13 @@ async def update_user(email: EmailStr, uinfo: UserInfo_Update,
     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
     if not existing_user_email:
         raise HTTPException(
-            status_code=404, detail=f"User {email}does not exist"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"User {email}does not exist"
         )
 
     if cur_user.user_email != email:
-        raise HTTPException(status_code=404,
-                            detail="Not authorized to access this, Only SuperUser can access")
+        raise UnauthorizedException("Not authorized to access this")
     elif not cur_user.user_is_superuser:
-        raise HTTPException(status_code=404,
-                            detail="Not authorized to access this")
+        raise UnauthorizedException("Not authorized to access this")
     else:
         return get_user_info_service.update(db_session=db, _id=existing_user_email.id, obj=uinfo)
 
@@ -58,7 +44,7 @@ async def check_email_exists(email: EmailStr,
     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
     if not existing_user_email:
         raise HTTPException(
-            status_code=404, detail=f"User with {email} does not exist"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"User with {email} does not exist"
         )
     return f"User {email} exists"
 
@@ -69,7 +55,7 @@ async def get_userinfo_email(email: EmailStr,
     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
     if not existing_user_email:
         raise HTTPException(
-            status_code=404, detail=f"User with {email} does not exist"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"User with {email} does not exist"
         )
     return existing_user_email
 
@@ -92,16 +78,14 @@ async def update_user_password(email: EmailStr,
                                db: Session = Depends(deps.get_db),
                                cur_user: User_Info = Depends(deps.get_current_user)) -> User_Info:
     if cur_user.user_email != email:
-        raise HTTPException(status_code=404,
-                            detail="Not authorized to access this, Only SuperUser can access")
+        raise UnauthorizedException("Not authorized to access this")
     elif not cur_user.user_is_superuser:
-        raise HTTPException(status_code=404,
-                            detail="Not authorized to access this, Only SuperUser can access")
+        raise UnauthorizedException("Not authorized to access this")
     else:
         existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
         if not existing_user_email or (existing_user_email.user_mobile != phone):
             raise HTTPException(
-                status_code=404, detail=f"User {email} does not exist"
+                status_code=status.HTTP_404_NOT_FOUND, detail=f"User {email} does not exist"
             )
 
         uinfo = UserInfo_Update(
@@ -112,14 +96,10 @@ async def update_user_password(email: EmailStr,
 
 @router.patch("/forget_password", status_code=status.HTTP_201_CREATED)
 async def forget_password(email: EmailStr,
-                          uname: str,
-                          phone: str,
                           db: Session = Depends(deps.get_db)):
     existing_user_email = get_user_info_service.get_by_email(db_session=db, uemail=email)
-    if (not existing_user_email and
-            (existing_user_email.user_mobile != phone) and
-            (existing_user_email.user_name != uname)):
+    if not existing_user_email:
         raise HTTPException(
-            status_code=404, detail=f"User {email} does not exist"
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"User {email} does not exist"
         )
     return {"response": "Your request to reset password is sent to your inbox"}

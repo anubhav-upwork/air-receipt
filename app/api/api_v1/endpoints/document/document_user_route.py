@@ -23,6 +23,8 @@ from app.schemas.document.document_audit_trail import DocumentAudit_Create
 from app.schemas.document.document_user import DocumentUser, DocumentUser_Create, DocumentUser_Update, \
     DocumentUser_Upload, DocumentUser_Show
 from app.schemas.user.user_info import UserInfo_Update
+from app.core.http_exceptions import DuplicateValueException, UnauthorizedException, NotFoundException, BadRequestException, UnprocessableEntityException, InternalServerException
+
 
 # Kafka Producer
 from aiokafka.errors import KafkaError, NodeNotReadyError, KafkaConnectionError
@@ -67,9 +69,7 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
                 f" content-type <{_file_content_type}>")
 
     if _file_content_type not in settings.ALLOWED_CONTENT:
-        raise HTTPException(
-            status_code=400, detail="Content Type Not Allowed!"
-        )
+        raise BadRequestException("Content Type Not Allowed!")
 
     file_name_hash = utils.generate_file_name(8) + f".{_extension}"
 
@@ -80,19 +80,13 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
                                                                              code=du.document_category_code)
 
     if not existing_class_code:
-        raise HTTPException(
-            status_code=400, detail="Document Class does not exist!"
-        )
+        raise NotFoundException("Document Class does not exist!")
 
     if not existing_category_code:
-        raise HTTPException(
-            status_code=400, detail=f"Document Category {du.document_category_code} does not exist !"
-        )
+        raise NotFoundException(f"Document Category {du.document_category_code} does not exist !")
 
     if existing_filehash:
-        raise HTTPException(
-            status_code=400, detail="Document with same hash exists"
-        )
+        raise DuplicateValueException("Document with same hash exists")
 
     num_pages = -1
     file_size = 0
@@ -105,24 +99,21 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
         logger.info(f"Size {file_size}")
 
         if file_size > settings.MAX_FILE_SIZE_KB:
-            raise HTTPException(status_code=400,
-                                detail=f"Uploaded document exceeds File Size Limit {settings.MAX_FILE_SIZE_KB} Kb!")
+            raise BadRequestException(f"Uploaded document exceeds File Size Limit {settings.MAX_FILE_SIZE_KB} Kb!")
 
         if _extension in ["pdf", "PDF", "Pdf"]:
             num_pages = FileLogic.validate_pdf_file_online(filename=file_name_hash,
                                                            filestream=BytesIO(content),
                                                            file_pass=du.document_password)
             if num_pages < 1:
-                raise HTTPException(status_code=400, detail="Document pdf could not be read!")
+                raise UnprocessableEntityException("Document pdf could not be read!")
         else:
             num_pages = 1
 
     except HTTPException as ex:
-        raise HTTPException(status_code=400, detail=ex.detail)
+        raise InternalServerException(ex.detail)
     except Exception as ex:
-        raise HTTPException(
-            status_code=400, detail="File writing error"
-        )
+        raise InternalServerException("File writing error")
 
     # execute credit logic
     new_credit_balance = Credit_Logic.debit(num_pages_scanned=num_pages,
@@ -130,9 +121,7 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
                                             current_credits=float(cur_user.user_credit))
 
     if new_credit_balance < 1:
-        raise HTTPException(
-            status_code=400, detail="Not enough credits!"
-        )
+        raise BadRequestException("Not enough credits!")
     else:
         # write file to disk
         with open(_file_save_path + "/" + file_name_hash, 'wb') as f:
@@ -186,17 +175,13 @@ async def upload_document(du: DocumentUser_Upload = Depends(),
             await send_kafka_message(parser_producer, kafDoc)
     except NodeNotReadyError as ke:
         logger.error(f"Error: Kafka producer connection error: ({ke})")
-        raise HTTPException(
-            status_code=400, detail="Could not transmit document to backend, Communication Error!"
-        )
+        raise InternalServerException("Could not transmit document to backend, Communication Error!")
 
     except KafkaConnectionError as ke:
         logger.error(f"Error: Kafka producer connection error: ({ke})")
 
     except KafkaError as ke:
-        raise HTTPException(
-            status_code=400, detail="Could not transmit document to backend, Communication Error!"
-        )
+        raise InternalServerException("Could not transmit document to backend, Communication Error!")
     return result_obj
 
 
@@ -229,9 +214,7 @@ async def delete_document(document_id: str,
     """
     existing_filehash = get_document_user_service.get_by_doc_id(db_session=db, doc_id=document_id)
     if not existing_filehash:
-        raise HTTPException(
-            status_code=400, detail=f"Document with filename {document_id} does not exist!"
-        )
+        raise NotFoundException(f"Document with filename {document_id} does not exist!")
     du = DocumentUser_Update(
         document_is_deleted=True
     )

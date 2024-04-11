@@ -1,13 +1,13 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from app.api import deps
-from app.models.user.user_info import User_Info
-
+from app.core.http_exceptions import DuplicateValueException, UnauthorizedException
 from app.crud.document.document_category import get_document_category_service
 from app.models.documents.document_category import Document_Category
+from app.models.user.user_info import User_Info
 from app.schemas.document.document_category import DocumentCategory, DocumentCategory_Create
 
 router = APIRouter(prefix="/doc-category", tags=["Document Category"])
@@ -25,18 +25,14 @@ async def create_doc_category(dc: DocumentCategory_Create,
     @return: Output Document Category Pydantic Object
     """
     if not cur_user.user_is_superuser:
-        raise HTTPException(
-            status_code=401, detail="Not authorized to access this"
-        )
+        raise UnauthorizedException("Not authorized to access this, Only SuperUser can access")
 
     existing_category = get_document_category_service.get_by_doccategory(db_session=db,
                                                                          doc_cat=dc.category)
     existing_cat_code = get_document_category_service.get_by_doccatcode(db_session=db,
                                                                         code=dc.category_code)
     if existing_category or existing_cat_code:
-        raise HTTPException(
-            status_code=400, detail="Document Category or Code already exists"
-        )
+        raise DuplicateValueException("Document Category or Code already exists")
     return get_document_category_service.create(db_session=db, obj_in=dc)
 
 
