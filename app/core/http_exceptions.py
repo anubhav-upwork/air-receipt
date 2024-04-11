@@ -6,9 +6,9 @@ from fastapi import HTTPException, status
 
 class CustomException(HTTPException):
     def __init__(
-        self,
-        status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,
-        detail: Union[str, None] = None,
+            self,
+            status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail: Union[str, None] = None,
     ):
         if not detail:
             detail = HTTPStatus(status_code).description
@@ -64,4 +64,13 @@ class InternalServerException(CustomException):
         super().__init__(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail
         )
+
+
+class InProcessException(CustomException):
+    def __init__(self, detail: Union[str, None] = None):
+        super().__init__(
+            status_code=status.HTTP_102_PROCESSING, detail=detail
+        )
+
+
 
