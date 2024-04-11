@@ -32,9 +32,9 @@ async def list_integrations(db: Session = Depends(deps.get_db)) -> List[Integrat
 
 
 @router.get("/activate_integration", status_code=status.HTTP_200_OK)
-async def activate_integration(_id: int, name: str, db: Session = Depends(deps.get_db)) -> Integrations:
+async def activate_integration(name: str, db: Session = Depends(deps.get_db)) -> Integrations:
     try:
-        check_this = next(x for x in fake_db_integrations if (x.integration_app == name and x.id == _id))
+        check_this = next(x for x in fake_db_integrations if (x.integration_app == name))
         check_this.is_active = True
     except Exception as ex:
         raise NotFoundException(f"Integration {name} not found in db, check type case and spelling")
@@ -42,10 +42,10 @@ async def activate_integration(_id: int, name: str, db: Session = Depends(deps.g
 
 
 @router.get("/deactivate_integration", status_code=status.HTTP_200_OK)
-async def deactivate_integration(_id: int, name: str, db: Session = Depends(deps.get_db)) -> Integrations:
+async def deactivate_integration(name: str, db: Session = Depends(deps.get_db)) -> Integrations:
     try:
-        check_this = next(x for x in fake_db_integrations if (x.integration_app == name and x.id == _id))
-        check_this.is_active = True
+        check_this = next(x for x in fake_db_integrations if (x.integration_app == name))
+        check_this.is_active = False
     except Exception as ex:
         raise NotFoundException(f"Integration {name} not found in db, check type case and spelling")
     return check_this
