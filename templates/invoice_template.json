@@ -1,0 +1,33 @@
+{
+  "header": {
+    "seller_name": "",
+    "seller_address": "",
+    "seller_phone": "",
+    "seller_email": "",    
+    "invoice_date": "",
+    "invoice_no": "",
+    "seller_account_no": "",
+    "buyer_name": "",
+    "seller_tax_id": "",
+    "buyer_tax_id": ""        
+  },
+  "items": [
+    {
+      "item_reference": "",
+      "item_name": "",
+      "item_cost": "",
+      "item_tax": "",
+      "item_tax_rate": "",
+      "item_rate": "",
+      "item_quantity": ""
+    }
+  ],
+  "summary": {
+    "sub_total_return": "",
+    "sub_total": "",
+    "total": "",
+    "gst_included": "",
+    "tax_amount": "",
+    "transaction_id": ""
+  }
+}

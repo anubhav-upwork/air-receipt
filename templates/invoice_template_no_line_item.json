@@ -1,0 +1,18 @@
+{
+    "seller_name": "",
+    "seller_address": "",
+    "seller_phone": "",
+    "seller_email": "",    
+    "invoice_date": "",
+    "invoice_no": "",
+    "seller_account_no": "",
+    "buyer_name": "",
+    "seller_tax_id": "",
+    "buyer_tax_id": "",        
+    "sub_total_return": "",
+    "sub_total": "",
+    "total": "",
+    "gst_included": "",
+    "tax_amount": "",
+    "transaction_id": ""
+}
